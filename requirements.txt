@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-dotenv
+httpx
+beautifulsoup4
+langchain
+langchain-community
+langchain-openai
+openai
+faiss-cpu
+pypdf

@@ -1,0 +1,11 @@
+
+# venv\Scripts\deactivate  
+# python -m venv venv        
+# venv\Scripts\activate  
+# pip install -r requirements.txt
+# uvicorn server:app --reload 
+
+most important to run the indexer.py to save data to vector database, 
+then run server.py to start the chatbot server.
+
+

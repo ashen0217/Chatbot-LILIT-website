@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LILIT -  Sri Lanka Institute of Language and Information Technology">
+    <meta name="keywords" content="education, Sri Lanka, higher education, courses, LMS">
+    <meta name="theme-color" content="#1e3a8a">
+    <link rel="icon" type="image/png" href="https://lms.lilit.lk/storage/app/public/Logo/Lilit emblem.png" >
+    <title>LILIT - Lanka Institute of Language and Information Technology</title>
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- External Libraries -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-navy': '#08284eff',
+                        'primary-orange': '#f97316',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Hide scrollbar when menu is open */
+        body.menu-open {
+            overflow: hidden;
+        }
+        
+        /* Logo gradient text */
+        .logo-gradient {
+            background: linear-gradient(135deg, #011E41 0%, #1e3a5f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo-tagline {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Header scroll effect */
+        .header-scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Top bar hide animation */
+        #top-bar {
+            max-height: 40px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+            opacity: 1;
+        }
+        
+        #top-bar.hidden-bar {
+            max-height: 0;
+            opacity: 0;
+        }
+        
+        #top-bar.hidden-bar > div > div {
+            height: 0 !important;
+            padding: 0;
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu-enter {
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        
+        .mobile-menu-exit {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+        
+        /* Nav link hover effect */
+        .nav-link-hover::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: #f97316;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link-hover:hover::after {
+            width: 100%;
+        }
+        
+        /* Dropdown animation */
+        .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-parent:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* Header spacer transition */
+        #header-spacer {
+            transition: height 0.3s ease-out;
+        }
+        
+        #header-spacer.scrolled {
+            height: 64px !important;
+        }
+        
+        @media (min-width: 640px) {
+            #header-spacer.scrolled {
+                height: 72px !important;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            #header-spacer.scrolled {
+                height: 80px !important;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            #header-spacer.scrolled {
+                height: 96px !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="font-inter">
+
+    <!-- Header -->
+    <header id="main-header" class="w-full fixed top-0 z-50 transition-all duration-300">
+        
+       <!-- Top Bar -->
+        <div id="top-bar" class="hidden md:block bg-primary-navy text-white relative overflow-hidden">
+            <!-- Orange Background Box - Right Side 2/3 -->
+            <div class="absolute top-0 right-0 w-2/3 h-full bg-orange-600 rounded-bl-full"></div>
+            
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative z-10">
+                <div class="h-9 sm:h-10 flex items-center justify-between text-[10px] sm:text-xs transition-all duration-300">
+                    
+                    <!-- Left Side - Social Icons -->
+                    <div class="flex items-center gap-3">
+                        <span class="text-white/80 font-medium">Follow Us:</span>
+                        <div class="flex items-center gap-2">
+                            <a href="#" class="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-primary-orange transition-all duration-300 hover:scale-110">
+                                <i class="fab fa-facebook-f text-[10px]"></i>
+                            </a>
+                            <a href="#" class="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-primary-orange transition-all duration-300 hover:scale-110">
+                                <i class="fab fa-x-twitter text-[10px]"></i>
+                            </a>
+                            <a href="#" class="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-primary-orange transition-all duration-300 hover:scale-110">
+                                <i class="fab fa-linkedin-in text-[10px]"></i>
+                            </a>
+                            <a href="#" class="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-primary-orange transition-all duration-300 hover:scale-110">
+                                <i class="fab fa-youtube text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side - Contact Info -->
+                    <div class="flex items-center gap-4 md:gap-6 ml-auto">
+                        <a href="mailto:info@lilit.lk" class="flex items-center gap-1.5 group-hover:scale-110 transition-colors duration-300 group">
+                            <i class="fas fa-envelope text-white group-hover:scale-110 transition-transform duration-300"></i>
+                            <span>info@lilit.lk</span>
+                        </a>
+                        <span class="w-px h-4 bg-white/30"></span>
+                        <a href="tel:+94704388464" class="flex items-center gap-1.5 group-hover:scale-110 transition-colors duration-300 group">
+                            <i class="fas fa-phone text-white group-hover:scale-110 transition-transform duration-300"></i>
+                            Hotline: <span>+94 70 438 8464</span>
+                        </a>
+                        <span class="w-px h-4 bg-white/30"></span>
+                        <a href="tel:+94716616699" class="flex items-center gap-1.5 group-hover:scale-110 transition-colors duration-300 group">
+                            <i class="fas fa-phone text-white group-hover:scale-110 transition-transform duration-300"></i>
+                            Helpdesk: <span>+94 71 661 6699</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation -->
+        <div id="main-nav" class="bg-primary-navy shadow-lg transition-all duration-300">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+                <div class="flex items-center justify-between h-16 sm:h-18 md:h-20 lg:h-24">
+                    
+                    <!-- Logo -->
+                    <!-- <a href="https://lms.lilit.lk" class="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+                        <div class="relative">
+                            <img src="https://lms.lilit.lk/storage/app/public/logo/lilit_logo.png" alt="LILIT Logo" class="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <div class="flex flex-col">
+                            <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white leading-tight tracking-tight">
+                                LILIT
+                            </h1>
+                            <p class="text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-semibold text-primary-orange leading-tight max-w-[120px] sm:max-w-[140px] md:max-w-[160px] lg:max-w-none">
+                                Sri Lanka Institute of Language
+                                <span class="hidden sm:inline"><br>and Information Technology</span>
+                                <span class="sm:hidden"> & IT</span>
+                            </p>
+                        </div>
+                    </a> -->
+
+                    <a href="https://lms.lilit.lk" class="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+                        <div class="relative">
+                            <img src="https://lms.lilit.lk/storage/app/public/Logo/LIT logo  2.png" alt="LILIT Logo" class="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                    </a>
+                    
+                    <!-- Desktop Navigation -->
+                    <nav class="hidden lg:flex items-center h-full">
+                        <ul class="flex items-center h-full gap-1">
+                            <li class="h-full">
+                                <a href="https://lms.lilit.lk" class="nav-link-hover relative h-full flex items-center px-4 xl:px-5 text-white font-semibold text-sm uppercase tracking-wide hover:text-primary-orange transition-colors duration-300">
+                                    Home
+                                </a>
+                            </li>
+                            
+                            <li class="h-full">
+                                <a href="https://lms.lilit.lk/about" class="nav-link-hover relative h-full flex items-center px-4 xl:px-5 text-white font-semibold text-sm uppercase tracking-wide hover:text-primary-orange transition-colors duration-300">
+                                    About
+                                </a>                                
+                            </li>
+                            <li class="h-full">
+                                <a href="https://lms.lilit.lk/all-courses" class="nav-link-hover relative h-full flex items-center px-4 xl:px-5 text-white font-semibold text-sm uppercase tracking-wide hover:text-primary-orange transition-colors duration-300">
+                                    Courses
+                                </a>
+                            </li>
+                            
+                            <li class="h-full">
+                                <a href="https://lms.lilit.lk/verify" class="nav-link-hover relative h-full flex items-center px-4 xl:px-5 text-white font-semibold text-sm uppercase tracking-wide hover:text-primary-orange transition-colors duration-300">
+                                    Certificates
+                                </a>
+                            </li>
+                            
+                            <li class="h-full">
+                                <a href="https://lms.lilit.lk/news" class="nav-link-hover relative h-full flex items-center px-4 xl:px-5 text-white font-semibold text-sm uppercase tracking-wide hover:text-primary-orange transition-colors duration-300">
+                                    News
+                                </a>
+                            </li>
+                            
+                            <li class="h-full">
+                                <a href="https://lms.lilit.lk/contact" class="nav-link-hover relative h-full flex items-center px-4 xl:px-5 text-white font-semibold text-sm uppercase tracking-wide hover:text-primary-orange transition-colors duration-300">
+                                    Contact
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    
+                    <!-- Desktop Action Buttons -->
+                    <div class="hidden lg:flex items-center gap-3">
+                                                <a href="https://lms.lilit.lk/login" class="flex items-center gap-2 px-4 xl:px-5 py-2 xl:py-2.5 border-2 border-primary-orange text-primary-orange font-semibold text-sm  hover:bg-primary-orange hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-primary-orange/30">
+                            <span>Login</span>
+                        </a>
+
+                        <a href="https://lms.lilit.lk/register" class="flex items-center gap-2 px-4 xl:px-5 py-2 xl:py-2.5 bg-primary-orange border-2 border-primary-orange text-white font-semibold text-sm  hover:bg-orange-600 hover:border-orange-600 transition-all duration-300 hover:shadow-lg hover:shadow-primary-orange/30 hover:scale-105">
+                            <span>Sign Up</span>
+                        </a>
+                                            </div>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button 
+                        id="mobile-menu-toggle" 
+                        class="lg:hidden flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-white/10 text-white hover:bg-primary-orange transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-orange focus:ring-offset-2 focus:ring-offset-primary-navy"
+                        aria-label="Toggle menu"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu">
+                        <svg id="menu-icon" class="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        <svg id="close-icon" class="w-5 h-5 sm:w-6 sm:h-6 hidden transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="lg:hidden hidden bg-primary-navy border-t border-white/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+                <nav class="flex flex-col gap-1">
+                    
+                    <!-- Mobile Nav Links -->
+                    <a href="https://lms.lilit.lk" class="mobile-nav-link flex items-center gap-3 px-4 py-3 text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-home w-5 text-primary-orange"></i>
+                        Home
+                    </a>
+                    <a href="https://lms.lilit.lk/about" class="mobile-nav-link flex items-center gap-3 px-4 py-3 text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-info-circle w-5 text-primary-orange"></i>
+                        About    
+                    </a>
+                    <a href="https://lms.lilit.lk/all-courses" class="mobile-nav-link flex items-center gap-3 px-4 py-3 text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-book-open w-5 text-primary-orange"></i>
+                        Courses
+                    </a>
+                    <a href="https://lms.lilit.lk/verify" class="mobile-nav-link flex items-center gap-3 px-4 py-3 text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-user-graduate w-5 text-primary-orange"></i>
+                        Certificates
+                    </a>
+                    <a href="https://lms.lilit.lk/news" class="mobile-nav-link flex items-center gap-3 px-4 py-3 text-white font-semibold text-sm uppercase tracking-wide hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-newspaper w-5 text-primary-orange"></i>
+                        News
+                    </a>
+                    
+                    <a href="https://lms.lilit.lk/contact" class="mobile-nav-link flex items-center gap-3 px-4 py-3 text-white font-semibold text-sm uppercase tracking-wide hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-envelope w-5 text-primary-orange"></i>
+                        Contact
+                    </a>
+                    
+                    <!-- Mobile Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-white/10">
+                                                <a href="https://lms.lilit.lk/login" class="flex items-center justify-center gap-2 px-5 py-3 border-2 border-primary-orange text-primary-orange font-semibold text-sm  hover:bg-primary-orange hover:text-white transition-all duration-300">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Login</span>
+                        </a>
+                        <a href="https://lms.lilit.lk/register" class="flex items-center justify-center gap-2 px-5 py-3 bg-primary-orange border-2 border-primary-orange text-white font-semibold text-sm  hover:bg-orange-600 hover:border-orange-600 transition-all duration-300">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Sign Up</span>
+                        </a>
+                                            </div>
+                    
+                    <!-- Mobile Contact Info -->
+                    <div class="mt-4 pt-4 border-t border-white/10 space-y-3">
+                        <a href="tel:+94704388464" class="flex items-center gap-3 text-white/80 text-sm hover:text-primary-orange transition-colors duration-300">
+                            Hotline: +94 70 438 8464
+                        </a>
+                        <a href="tel:+94716616699" class="flex items-center gap-3 text-white/80 text-sm hover:text-primary-orange transition-colors duration-300">
+                            Helpdesk: +94 71 661 6699
+                        </a>
+                        <a href="mailto:info@lilit.ac.lk" class="flex items-center gap-3 text-white/80 text-sm hover:text-primary-orange transition-colors duration-300">
+                            info@lilit.lk
+                        </a>
+                        <div class="flex items-center gap-3 pt-2">
+                            <span class="text-white/60 text-xs">Follow Us:</span>
+                            <div class="flex items-center gap-2">
+                                <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-primary-orange transition-all duration-300">
+                                    <i class="fab fa-facebook-f text-xs"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-primary-orange transition-all duration-300">
+                                    <i class="fab fa-twitter text-xs"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-primary-orange transition-all duration-300">
+                                    <i class="fab fa-linkedin-in text-xs"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-primary-orange transition-all duration-300">
+                                    <i class="fab fa-youtube text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Backdrop -->
+        <div id="menu-backdrop" class="lg:hidden hidden fixed inset-0 bg-black/50 z-[-1]"></div>
+    </header>
+
+    <!-- Spacer for fixed header -->
+    <!-- Spacer for fixed header -->
+    <div id="header-spacer" class="h-16 sm:h-[72px] md:h-[120px] lg:h-[136px] transition-all duration-300"></div>
+
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
+            const menuBackdrop = document.getElementById('menu-backdrop');
+            const header = document.getElementById('main-header');
+            const topBar = document.getElementById('top-bar');
+            const headerSpacer = document.getElementById('header-spacer');
+            const body = document.body;
+            
+            // Scroll threshold for hiding top bar
+            const scrollThreshold = 50;
+            
+            // Mobile menu toggle
+            function toggleMenu() {
+                const isOpen = !mobileMenu.classList.contains('hidden');
+                
+                if (isOpen) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            }
+            
+            function openMenu() {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('mobile-menu-enter');
+                menuBackdrop.classList.remove('hidden');
+                menuIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+                mobileMenuToggle.setAttribute('aria-expanded', 'true');
+                body.classList.add('menu-open');
+            }
+            
+            function closeMenu() {
+                mobileMenu.classList.add('mobile-menu-exit');
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.remove('mobile-menu-enter', 'mobile-menu-exit');
+                }, 300);
+                menuBackdrop.classList.add('hidden');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+                mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                body.classList.remove('menu-open');
+            }
+            
+            // Event listeners
+            mobileMenuToggle.addEventListener('click', toggleMenu);
+            menuBackdrop.addEventListener('click', closeMenu);
+            
+            // Mobile dropdown toggles
+            const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+            mobileDropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const menu = this.nextElementSibling;
+                    const icon = this.querySelector('.fa-chevron-down');
+                    
+                    menu.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+            
+            // Close menu on link click
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link, .mobile-dropdown-menu a');
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    setTimeout(closeMenu, 150);
+                });
+            });
+            
+            // Header scroll effect with top bar hide
+            let lastScroll = 0;
+            let ticking = false;
+            
+            function handleScroll() {
+                const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (currentScroll > scrollThreshold) {
+                    // Scrolled past threshold - hide top bar
+                    header.classList.add('header-scrolled');
+                    topBar.classList.add('hidden-bar');
+                    headerSpacer.classList.add('scrolled');
+                } else {
+                    // At top - show top bar
+                    header.classList.remove('header-scrolled');
+                    topBar.classList.remove('hidden-bar');
+                    headerSpacer.classList.remove('scrolled');
+                }
+                
+                lastScroll = currentScroll;
+                ticking = false;
+            }
+            
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        handleScroll();
+                    });
+                    ticking = true;
+                }
+            });
+            
+            // Initial check
+            handleScroll();
+            
+            // Close menu on resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1024 && !mobileMenu.classList.contains('hidden')) {
+                    closeMenu();
+                }
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+                    closeMenu();
+                }
+            });
+        });
+    </script>
+
+
+<section class="relative py-20  overflow-hidden ">
+    
+    
+    <div class="absolute inset-0 z-0">
+        
+        <img 
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1920" 
+            alt="Background" 
+            class="w-full h-full object-cover"
+        >
+    </div>
+
+    
+    <div class="absolute inset-0 z-0 bg-blue-900/90 mix-blend-multiply"></div>
+    
+    <div class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="max-w-4xl">
+            
+            <h1 class="text-5xl  font-bold text-white leading-none tracking-tight">
+                Our <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Courses</span>
+            </h1>
+             
+            
+            <nav class="mt-6" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2 text-sm text-blue-100">
+                    <li>
+                        <a href="https://lms.lilit.lk/home" class="hover:text-white transition-colors">
+                            <i class="fas fa-home mr-2"></i>Home
+                        </a>
+                    </li>
+                    <li>
+                        <span class="text-blue-300">/</span>
+                    </li>
+                    <li class="text-white font-medium">
+                        Courses
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</section>
+
+
+<section class="bg-gradient-to-br from-gray-50 to-blue-50 py-4 md:py-4 lg:py-4 xl:py-8" data-aos="fade-up">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="flex flex-col lg:flex-row gap-6">
+            
+            
+            <div class="flex-1">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ri-search-line text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="courseSearch" 
+                        placeholder="Search courses by title, description, or keywords..."
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none transition-all duration-200"
+                    >
+                    <div id="searchClear" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hidden">
+                        <i class="ri-close-line text-gray-400 hover:text-gray-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="flex flex-wrap gap-4">
+                
+                <div class="relative">
+                    <select id="sortBy" class="appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="name_asc">Name (A-Z)</option>
+                        <option value="name_desc">Name (Z-A)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <i class="ri-arrow-down-s-line"></i>
+                    </div>
+                </div>
+
+                
+                <button id="resetFilters" class="px-4 py-3 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="ri-refresh-line mr-2"></i>Reset
+                </button>
+            </div>
+        </div>
+
+        
+        <div id="activeFilters" class="mt-4 hidden">
+            <div class="flex items-center flex-wrap gap-2">
+                <span class="text-sm text-gray-600">Active filters:</span>
+                <div id="filterTags" class="flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section id="all-courses" class="bg-gradient-to-br from-gray-50 to-blue-50 py-12 md:py-16 lg:py-20 xl:py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8" data-aos="fade-up" data-aos-delay="150">
+            <div>
+                <p class="text-sm text-gray-600">
+                    Showing <span id="courseCount" class="font-semibold text-blue-900">5</span> 
+                    <span id="filteredText">courses</span>
+                </p>
+                <p id="noResultsMessage" class="text-sm text-red-600 mt-1 hidden">
+                    No courses found. Try adjusting your search or filters.
+                </p>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://lms.lilit.lk" class="text-sm text-orange-500 hover:text-orange-600 font-semibold flex items-center gap-2 transition-colors">
+                    <i class="ri-home-line"></i>
+                    <span class="hidden sm:inline">Back to Home</span>
+                </a>
+            </div>
+        </div>
+
+        
+        <div id="coursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            
+                        <div class="course-card bg-white shadow-lg hover:shadow-2xl overflow-hidden h-full flex flex-col"
+                data-aos="fade-up"
+                data-aos-delay="0"
+                data-title="ai content creation"
+                data-description="දවසින් දවස update වන නවීනතම ai තාක්ෂණය භාවිතා කර  videos, graphics, music සහ අතිවිශිෂ්ට content නිර්මාණය කරන්න ආශවෙන්, උනන්දුවෙන් සම්බන්ධවුණු ඔබ වෙනුවෙන්ම ලංකාවේ ප්‍රමුඛතම ai තාක්ෂණික අධ්‍යාපන ආයතනය වන &#039;ලංකා භාෂා හා තොරතුරු තාක්ෂණ ආයතනය&#039; විසින් ගෙන එන ai content creation පාඨමාලාව.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+මෙම පාඨමාලාවෙන් ඔබ ඉගෙනගන්නා දේවල්:
+prompt engineering: zero මට්ටමේ සිට &#039;prompt master&#039; කෙනෙකු දක්වා (techniques සහ json prompts සමඟ)
+ai image &amp;amp; video generation: සිතන දේ රූපයක් කරන්නත්, viral සහ cinematic වීඩියෝ නිර්මාණය.
+ai music generation: copyright ගැටළු නොමැතිව music නිර්මාණය.
+video editing: ලෝකයේ ජනප්‍රියම capcut editing app එක හරහා මුල සිට වෘත්තීය මට්ටමට වීඩියෝ සංස්කරණය.
+social media mastery: youtube සහ facebook හරහා සාර්ථකව audience එකක් ගොඩනගාගෙන ආදායම් ඉපයීම.
+💰 සුවිශේෂී දීමනාව: රු. 12,000/- ක් වටිනා මෙම පාඨමාලාව දැන් ඔබට සම්පූර්ණයෙන්ම නොමිලේ!
+(රු.1,000/= ක ලියාපදිංචි ගාස්තුව පමණක් ගෙවා ලබාගත හැකියි)දවසින් දවස update වන නවීනතම ai තාක්ෂණය භාවිතා කර&amp;nbsp;
+
+
+
+
+
+
+
+
+
+
+
+
+"
+                data-date="1773166011">
+                
+                
+                <div class="relative overflow-hidden h-44 sm:h-48 md:h-52">
+                    <img src="https://lms.lilit.lk/storage/app/public/course_details_image/1773201622name_AI Content Creation.jpg"
+                        alt="AI Content Creation"
+                        class="card-image w-full h-full object-cover">
+                    
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+
+                    
+                                        <div class="absolute top-3 sm:top-4 left-3 sm:left-4">
+                        <span class="bg-blue-900 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold shadow-md">
+                            e-Certificate
+                        </span>
+                    </div>
+                                    </div>
+
+                
+                <div class="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
+                    
+                    
+                    <h3 class="font-bold text-base sm:text-lg text-blue-900 mb-2 line-clamp-2 hover:text-orange-500 transition-colors cursor-pointer">
+                        AI Content Creation
+                    </h3>
+
+                    
+                    <div class="text-gray-500 text-xs sm:text-sm mb-4 line-clamp-2 leading-relaxed flex-grow">
+                         දවසින් දවස Update වන නවීනතම AI තාක්ෂණය භාවිතා කර  Videos, Graphics, Music සහ අතිවිශිෂ්ට Content නිර්...
+                    </div>
+
+                    
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
+                                                <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-vidicon-line mr-1 text-orange-500"></i>Full Online/LMS
+                        </span>
+                                                                        <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-global-line mr-1 text-orange-500"></i>Sinhala
+                        </span>
+                                            </div>
+
+                    
+                    <div class="border-t border-gray-100 pt-3 sm:pt-4 mt-auto">
+                        <a href="https://lms.lilit.lk/course-details/7" class="btn-gradient text-white w-full py-2.5 sm:py-3 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2">
+                            View Details
+                            <i class="ri-arrow-right-line text-[10px] sm:text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+                        <div class="course-card bg-white shadow-lg hover:shadow-2xl overflow-hidden h-full flex flex-col"
+                data-aos="fade-up"
+                data-aos-delay="50"
+                data-title="web design wordpress with ai"
+                data-description="✅ ලෝකයේ වැඩිම පිරිසක් භාවිතා කරන, ලෝකයේ ප්‍රමුඛතම වෙබ් අඩවි පවා නිර්මාණය කරන wordpress සහ කෘතිම බුද්ධි (ai) තාක්ෂණය සමඟින් ඉතාම කෙටි කලකින්ම වෘත්තීය මට්ටමේ වෙබ් අඩවි නිර්මාණකරුවෙකු වීමට ඔබටත් අවස්ථාවක්.
+
+✅ coding දැනුමක් අවශ්‍ය නෑ. මේ පාඨමාලාවේදී ඔබට elementor සහ wordpress හි නවීන තාක්ෂණය වන block theme (full site editing – fse) භාවිතා කර වෙබ්අඩවියක් නිර්මාණය කරන ආකාරය මුල සිට ඉතාම සරලව පියවරෙන් පියවර ඉගෙන ගන්න පුලුවන්.
+✅ මෙහිදී අපි ඔබත් සමග ප්‍රායෝගිකවම වෘත්තීය මට්ටමේ වෙබ්අඩවියක් නිර්මාණය කරනවා. පාඨමාලාව අවසන් වන විට client requirements හඳුනාගෙන ඒ අනුව වෙබ් අඩවියක් සැලසුම් කිරීමේ සිට host කිරීම සහ maintain කිරීම දක්වා සියලුම පියවර ඔබට තනිවම කල හැකි මට්ටමට දැනුම ලබාගත හැකියි.
+✅ විශේෂයෙන්ම පාඨමාලාව අවසානයේ ඔබට හිමිවන්නේ ශ්‍රී ලංකාවේ තොරතුරු තාක්ෂණ ක්ෂේත්‍රය හා භාෂා කුසලතා ඉහළ නැංවීම වෙනුවෙන් ස්ථාපිත ලංකා භාෂා හා තොරතුරු තාක්ෂණ ආයතනය විසින්ම ලබා දෙන පිළිගත් සහතිකයක්.
+✅ ඒ වගේම ලංකා භාෂා හා තොරතුරු තාක්ෂණන ආයතනයේ පාඨමාලා සඳහා ලියාපදිංචිය ලබන ඔබට පාඨමාලා කාලයෙන් පසුවත් තාක්ෂණික වෘත්තීය ජීවිතය තුළ ඕනෑම අවස්ථාවකදී අවශ්‍ය තාක්ෂණික සහයෝගය ලබාගත හැකි වීමත් විශේෂයි. (කොන්දේසි සහිතයි)
+✅ ශ්‍රී ලංකාවේ තොරතුරු තාක්ෂණ ක්ෂේත්‍රය හා භාෂා කුසලතා ඉහළ නැංවීම වෙනුවෙන්ම ස්ථාපිත ආයතනයක් ලෙස මෙම පාඨමාලාවලදී අය කරන්නේ ඔබට දැරිය හැකි පාඨමාලා තාක්ෂණික හා සම්පත්දායක ගාස්තුවක් පමණයි.
+👉 duration: 2 months (2 days per week)
+👉 mode: (live sessions + recordings)
+👉 lifetime lms access
+👉 unlimited support &amp;amp; guidance
+
+
+
+
+"
+                data-date="1768278513">
+                
+                
+                <div class="relative overflow-hidden h-44 sm:h-48 md:h-52">
+                    <img src="https://lms.lilit.lk/storage/app/public/course_details_image/1768278513name_Web Design WordPress with AI.webp"
+                        alt="Web Design WordPress with AI"
+                        class="card-image w-full h-full object-cover">
+                    
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+
+                    
+                                        <div class="absolute top-3 sm:top-4 left-3 sm:left-4">
+                        <span class="bg-blue-900 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold shadow-md">
+                            Certificate
+                        </span>
+                    </div>
+                                    </div>
+
+                
+                <div class="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
+                    
+                    
+                    <h3 class="font-bold text-base sm:text-lg text-blue-900 mb-2 line-clamp-2 hover:text-orange-500 transition-colors cursor-pointer">
+                        Web Design WordPress with AI
+                    </h3>
+
+                    
+                    <div class="text-gray-500 text-xs sm:text-sm mb-4 line-clamp-2 leading-relaxed flex-grow">
+                         ✅ ලෝකයේ වැඩිම පිරිසක් භාවිතා කරන, ලෝකයේ ප්‍රමුඛතම වෙබ් අඩවි පවා නිර්මාණය කරන WordPress සහ කෘතිම බුද...
+                    </div>
+
+                    
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
+                                                <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-vidicon-line mr-1 text-orange-500"></i>Full Online/ LMS
+                        </span>
+                                                                        <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-global-line mr-1 text-orange-500"></i>Sinhala
+                        </span>
+                                            </div>
+
+                    
+                    <div class="border-t border-gray-100 pt-3 sm:pt-4 mt-auto">
+                        <a href="https://lms.lilit.lk/course-details/5" class="btn-gradient text-white w-full py-2.5 sm:py-3 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2">
+                            View Details
+                            <i class="ri-arrow-right-line text-[10px] sm:text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+                        <div class="course-card bg-white shadow-lg hover:shadow-2xl overflow-hidden h-full flex flex-col"
+                data-aos="fade-up"
+                data-aos-delay="100"
+                data-title="national certificate in web development"
+                data-description="✅ web development is a dynamic field that involves designing, building, and maintaining websites. web developers are responsible for both the visual aesthetics and the technical performance of websites. this includes ensuring the site is responsive, fast, and able to handle large volumes of traffic. in addition to creating visually appealing interfaces, developers must also ensure the seamless functionality of websites.✅ to succeed in web development, professionals need a solid foundation in programming languages such as html, css, and javascript. furthermore, modern web development often requires proficiency in additional languages like sql and frameworks that enable interactive and data-driven features. familiarity with multimedia tools and keeping up with emerging technologies is crucial as the web development landscape continuously evolves.
+✅ this course is designed to equip students with the necessary skills to build effective, functional, and aesthetically pleasing websites. it will cover the fundamentals of web development, including design principles, programming concepts, and best practices, preparing learners for a variety of roles in the field.
+👉 duration: 6 months
+👉 mode: self-paced + live
+👉 lifetime lms access
+👉 unlimited support &amp;amp; guidance
+
+"
+                data-date="1768277994">
+                
+                
+                <div class="relative overflow-hidden h-44 sm:h-48 md:h-52">
+                    <img src="https://lms.lilit.lk/storage/app/public/course_details_image/1768277994name_National Certificate in Web Development.webp"
+                        alt="National Certificate in Web Development"
+                        class="card-image w-full h-full object-cover">
+                    
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+
+                    
+                                        <div class="absolute top-3 sm:top-4 left-3 sm:left-4">
+                        <span class="bg-blue-900 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold shadow-md">
+                            Certificate
+                        </span>
+                    </div>
+                                    </div>
+
+                
+                <div class="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
+                    
+                    
+                    <h3 class="font-bold text-base sm:text-lg text-blue-900 mb-2 line-clamp-2 hover:text-orange-500 transition-colors cursor-pointer">
+                        National Certificate in Web Development
+                    </h3>
+
+                    
+                    <div class="text-gray-500 text-xs sm:text-sm mb-4 line-clamp-2 leading-relaxed flex-grow">
+                         ✅ Web development is a dynamic field that involves designing, building, and maintaining websites. W...
+                    </div>
+
+                    
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
+                                                <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-vidicon-line mr-1 text-orange-500"></i>Full Online/ LMS
+                        </span>
+                                                                        <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-global-line mr-1 text-orange-500"></i>Sinhala
+                        </span>
+                                            </div>
+
+                    
+                    <div class="border-t border-gray-100 pt-3 sm:pt-4 mt-auto">
+                        <a href="https://lms.lilit.lk/course-details/4" class="btn-gradient text-white w-full py-2.5 sm:py-3 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2">
+                            View Details
+                            <i class="ri-arrow-right-line text-[10px] sm:text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+                        <div class="course-card bg-white shadow-lg hover:shadow-2xl overflow-hidden h-full flex flex-col"
+                data-aos="fade-up"
+                data-aos-delay="150"
+                data-title="arduino with future robotics"
+                data-description="want to help your child’s creative ideas come to life? let’s take them on an exciting journey into the world of robotics and innovation, where curiosity can grow and thrive.
+
+our special “robotics with arduino” course is designed specifically for students in grades 6, 7, 8, and 9. no prior knowledge is needed, making this a great opportunity for any child to build their skills in electronics and mechanics.
+what a student will learn:
+basic electronics: understanding electronic components and how they work in a simple way.
+mechanical technology: learning the principles and tools needed to build a physical creation.
+computer programming: mastering the basics of coding to bring robots to life.
+our main goal is to give students the technical knowledge needed to turn innovative ideas into reality. at the end of the course, we will guide each student to successfully participate in school-level and national robotics and innovation competitions.
+enroll a child today and take the first step toward helping them become a skilled innovator of the future!
+
+
+
+
+"
+                data-date="1768273421">
+                
+                
+                <div class="relative overflow-hidden h-44 sm:h-48 md:h-52">
+                    <img src="https://lms.lilit.lk/storage/app/public/course_details_image/1768273421name_Arduino With Future Robotics.webp"
+                        alt="Arduino With Future Robotics"
+                        class="card-image w-full h-full object-cover">
+                    
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+
+                    
+                                        <div class="absolute top-3 sm:top-4 left-3 sm:left-4">
+                        <span class="bg-blue-900 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold shadow-md">
+                            Certificate
+                        </span>
+                    </div>
+                                    </div>
+
+                
+                <div class="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
+                    
+                    
+                    <h3 class="font-bold text-base sm:text-lg text-blue-900 mb-2 line-clamp-2 hover:text-orange-500 transition-colors cursor-pointer">
+                        Arduino With Future Robotics
+                    </h3>
+
+                    
+                    <div class="text-gray-500 text-xs sm:text-sm mb-4 line-clamp-2 leading-relaxed flex-grow">
+                         Want to help your child’s creative ideas come to life? Let’s take them on an exciting journey into t...
+                    </div>
+
+                    
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
+                                                <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-vidicon-line mr-1 text-orange-500"></i>Full Online/ LMS
+                        </span>
+                                                                        <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-global-line mr-1 text-orange-500"></i>Sinhala
+                        </span>
+                                            </div>
+
+                    
+                    <div class="border-t border-gray-100 pt-3 sm:pt-4 mt-auto">
+                        <a href="https://lms.lilit.lk/course-details/3" class="btn-gradient text-white w-full py-2.5 sm:py-3 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2">
+                            View Details
+                            <i class="ri-arrow-right-line text-[10px] sm:text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+                        <div class="course-card bg-white shadow-lg hover:shadow-2xl overflow-hidden h-full flex flex-col"
+                data-aos="fade-up"
+                data-aos-delay="200"
+                data-title="ai for all"
+                data-description="දෛනික කටයුතු, අධ්‍යාපනය, වෘත්තීය සහ නිර්මාණ කටයුතු වඩාත් කාර්යක්ෂම කර ගැනීම සඳහා සරල, භාවිතයට පහසු ai මෙවලම් හඳුන්වා දීම සහ ඒවා ප්‍රායෝගිකව යොදාගන්නා ආකාරය පුහුණු කිරීම සදහා මෙම පාඨමාලාව සැලසුම් කර ඇත. ඔබගේ දැනුම මට්ටම කුමක් වුවත්, සරලව ඉදිරිපත් කරන පාඩම් තුළින් ක්‍රමාණුකූලව තම දැනුම මට්ටම ඉහළ නංවා ගැනීමටත්, තමන්ට අදාල ක්ෂේත්‍රවලට ගැළපෙන විශේෂ මොඩියුල තෝරාගෙන අධ්‍යනය කටයුතු සිදුකිරීමටත් අවස්ථාව හිමිවේ."
+                data-date="1767778415">
+                
+                
+                <div class="relative overflow-hidden h-44 sm:h-48 md:h-52">
+                    <img src="https://lms.lilit.lk/storage/app/public/course_details_image/1768278662name_AI for All.webp"
+                        alt="AI for All"
+                        class="card-image w-full h-full object-cover">
+                    
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+
+                    
+                                        <div class="absolute top-3 sm:top-4 left-3 sm:left-4">
+                        <span class="bg-blue-900 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold shadow-md">
+                            e-Certificate
+                        </span>
+                    </div>
+                                    </div>
+
+                
+                <div class="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
+                    
+                    
+                    <h3 class="font-bold text-base sm:text-lg text-blue-900 mb-2 line-clamp-2 hover:text-orange-500 transition-colors cursor-pointer">
+                        AI for All
+                    </h3>
+
+                    
+                    <div class="text-gray-500 text-xs sm:text-sm mb-4 line-clamp-2 leading-relaxed flex-grow">
+                         දෛනික කටයුතු, අධ්‍යාපනය, වෘත්තීය සහ නිර්මාණ කටයුතු වඩාත් කාර්යක්ෂම කර ගැනීම සඳහා සරල, භාවිතයට පහසු A...
+                    </div>
+
+                    
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
+                                                <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-vidicon-line mr-1 text-orange-500"></i>Full Online/LMS
+                        </span>
+                                                                        <span class="bg-gray-100 text-gray-600 px-2 py-1 text-[10px] sm:text-xs font-medium">
+                            <i class="ri-global-line mr-1 text-orange-500"></i>Sinhala
+                        </span>
+                                            </div>
+
+                    
+                    <div class="border-t border-gray-100 pt-3 sm:pt-4 mt-auto">
+                        <a href="https://lms.lilit.lk/course-details/2" class="btn-gradient text-white w-full py-2.5 sm:py-3 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2">
+                            View Details
+                            <i class="ri-arrow-right-line text-[10px] sm:text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        
+        <div id="loadingIndicator" class="text-center py-8 hidden">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <p class="mt-2 text-gray-600">Searching courses...</p>
+        </div>
+
+    </div>
+</section>
+
+
+<section class="py-12 sm:py-16 md:py-20 bg-blue-900">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            
+            
+            <div class="text-center lg:text-left" data-aos="fade-right">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
+                    Ready to Start <span class="text-orange-500">Learning?</span>
+                </h2>
+                <p class="text-sm sm:text-base md:text-lg text-blue-100 mb-6 sm:mb-8 leading-relaxed">
+                    Join thousands of students who are already advancing their careers with LILIT
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+                    <a href="https://lms.lilit.lk/register" class="btn-gradient inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-white font-semibold text-sm sm:text-base shadow-lg">
+                        <i class="ri-user-add-line mr-2 sm:mr-3"></i>
+                        Get Started Now
+                    </a>
+                    <a href="#all-courses" class="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-white text-white font-semibold text-sm sm:text-base hover:bg-white hover:text-blue-900 transition-all duration-300">
+                        <i class="ri-arrow-up-line mr-2 sm:mr-3"></i>
+                        Browse Courses
+                    </a>
+                </div>
+            </div>
+            
+            
+            <div class="space-y-3 sm:space-y-4" data-aos="fade-left">
+                <div class="flex items-center bg-white/10 p-4 sm:p-5 border border-white/20">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 flex items-center justify-center flex-shrink-0 mr-4">
+                        <i class="ri-check-line text-white text-sm sm:text-base"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm sm:text-base">Free Trial Access</h4>
+                        <p class="text-blue-200 text-xs sm:text-sm">Explore courses before enrolling</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center bg-white/10 p-4 sm:p-5 border border-white/20">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 flex items-center justify-center flex-shrink-0 mr-4">
+                        <i class="ri-customer-service-line text-white text-sm sm:text-base"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm sm:text-base">24/7 Support</h4>
+                        <p class="text-blue-200 text-xs sm:text-sm">Expert help when you need it</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center bg-white/10 p-4 sm:p-5 border border-white/20">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 flex items-center justify-center flex-shrink-0 mr-4">
+                        <i class="ri-award-line text-white text-sm sm:text-base"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm sm:text-base">Recognized Certificates</h4>
+                        <p class="text-blue-200 text-xs sm:text-sm">Industry-recognized credentials</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="w-full flex flex-col md:flex-row text-white font-sans">
+
+    <div class="group flex-1 bg-[#1e3a8a] py-10 px-8 flex items-center justify-center relative overflow-hidden cursor-pointer">
+        <i class="ri-phone-fill text-[11rem] absolute bottom-[-2rem] left-[-1rem] opacity-20 leading-none pointer-events-none transition-all duration-500 ease-in-out group-hover:opacity-35 group-hover:scale-125 group-hover:rotate-12"></i>     
+        <div class="relative z-10 flex items-center gap-6">
+            <i class="ri-phone-line text-6xl transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"></i>
+            <div>
+                <h3 class="font-extrabold text-3xl uppercase tracking-wide leading-none transition-all duration-300 group-hover:tracking-widest group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Hot Line</h3>
+                <p class="text-xl font-semibold mt-1 transition-all duration-300 group-hover:translate-x-1 group-hover:text-white/90">+94 70 438 8464</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-1 bg-[#f97316] py-10 px-8 flex items-center justify-center relative overflow-hidden cursor-pointer">
+        <i class="ri-customer-service-fill -rotate-45 text-[11rem] absolute bottom-[-2rem] left-[-1rem] opacity-20 leading-none pointer-events-none transition-all duration-500 ease-in-out group-hover:opacity-35 group-hover:scale-125 group-hover:rotate-0"></i>
+        <div class="relative z-10 flex items-center gap-6">
+            <i class="ri-customer-service-line text-6xl transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"></i>
+            <div>
+                <h3 class="font-extrabold text-3xl uppercase tracking-wide leading-none transition-all duration-300 group-hover:tracking-widest group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Help Line</h3>
+                <p class="text-xl font-semibold mt-1 transition-all duration-300 group-hover:translate-x-1 group-hover:text-white/90">+94 71 661 6699</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-1 bg-[#1e3a8a] py-10 px-8 flex items-center justify-center relative overflow-hidden cursor-pointer">
+        <i class="ri-mail-fill -rotate-45 text-[11rem] absolute bottom-[-2rem] left-[-1rem] opacity-20 leading-none pointer-events-none transition-all duration-500 ease-in-out group-hover:opacity-35 group-hover:scale-125 group-hover:rotate-0"></i>
+        <div class="relative z-10 flex items-center gap-6">
+            <i class="ri-mail-line text-6xl transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"></i>
+            <div>
+                <h3 class="font-extrabold text-3xl uppercase tracking-wide leading-none transition-all duration-300 group-hover:tracking-widest group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Mail Us</h3>
+                <p class="text-xl font-semibold mt-1 transition-all duration-300 group-hover:translate-x-1 group-hover:text-white/90">info@lilit.lk</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    <div class="bg-[#010d22ff] text-white pt-10 sm:pt-12 md:pt-14 lg:pt-16 pb-6 sm:pb-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12 xl:gap-16 mb-8 sm:mb-10 md:mb-12">
+
+                
+                <div class="text-center sm:text-left">
+                    
+                    <div class="mb-4 sm:mb-5 md:mb-6">
+                        <div class="flex flex-col sm:flex-row items-center justify-center sm:justify-start">
+                            <div class="logo-wrapper flex-shrink-0">
+                                <img src="https://lms.lilit.lk/storage/app/public/Logo/Lilit emblem.png" alt="LILIT Logo" class="w-12 h-12 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 object-contain mx-auto sm:mx-0">
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <h1 class="text-lg sm:text-lg md:text-xl lg:text-2xl font-bold text-white leading-tight text-center sm:text-left">LILIT</h1>
+                                <div class="text-center sm:text-left text-white/70 leading-snug">
+                                    <p class="text-[9px] sm:text-[10px] md:text-xs">
+                                        Lanka Institute of Language
+                                        <br class="hidden sm:block">
+                                        <span class="sm:hidden"> & </span>
+                                        <span class="hidden sm:inline">and </span>Information Technology
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-5 md:mb-6 leading-relaxed max-w-xs mx-auto sm:mx-0">
+                        Leading the way in higher education excellence, innovation, and research in Sri Lanka and beyond.
+                    </p>
+
+                    <div class="flex justify-center sm:justify-start space-x-2 sm:space-x-3">
+                        <a href="#" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-600 hover:scale-110 transition-all duration-300">
+                            <i class="fab fa-facebook-f text-sm sm:text-base"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-600 hover:scale-110 transition-all duration-300">
+                            <i class="fab fa-x-twitter text-sm sm:text-base"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-600 hover:scale-110 transition-all duration-300">
+                            <i class="fab fa-linkedin-in text-sm sm:text-base"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 sm:w-10 sm:h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-600 hover:scale-110 transition-all duration-300">
+                            <i class="fab fa-youtube text-sm sm:text-base"></i>
+                        </a>
+                    </div>
+                </div>
+
+                
+                <div class="text-center sm:text-left">
+                    <h4 class="text-base sm:text-lg font-bold mb-4 sm:mb-5 md:mb-6 relative inline-block sm:block">
+                        Navigation
+                        <span class="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-10 h-0.5 bg-orange-600 rounded-full"></span>
+                    </h4>
+                    <ul class="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                        <li>
+                            <a href="https://lms.lilit.lk" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://lms.lilit.lk/about" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                About Us
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://lms.lilit.lk/all-courses" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                Courses
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://lms.lilit.lk/news" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                News
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://lms.lilit.lk/contact" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                Contact Us
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                
+                <div class="text-center sm:text-left sm:col-span-2 lg:col-span-1">
+                    <h4 class="text-base sm:text-lg font-bold mb-4 sm:mb-5 md:mb-6 relative inline-block sm:block">
+                        Quick Links
+                        <span class="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-10 h-0.5 bg-orange-600 rounded-full"></span>
+                    </h4>
+                    <ul class="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                        <li>
+                            <a href="#" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                Academic calender
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://lms.lilit.lk/login" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                LMS Portal
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://lms.lilit.lk/verify" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                Cetificate Verification
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                Research Centers
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-gray-300 hover:text-orange-600 hover:pl-2 transition-all duration-300 inline-block">
+                                Help Desk
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            
+            <div class="border-t border-white/20 pt-6 sm:pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+                    <p class="text-[11px] sm:text-xs md:text-sm text-gray-300 text-center md:text-left order-2 md:order-1">
+                        © 2026 LILIT - Lanka Institute of Language and Information Technology. All rights reserved.
+                    </p>
+                    <ul class="flex flex-wrap justify-center gap-4 sm:gap-5 md:gap-6 text-[11px] sm:text-xs md:text-sm order-1 md:order-2">
+                        <li>
+                            <a href="https://lms.lilit.lk/privacy_policy" class="text-gray-300 hover:text-orange-600 transition-colors duration-300">
+                                Privacy Policy
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://lms.lilit.lk/terms_of_service" class="text-gray-300 hover:text-orange-600 transition-colors duration-300">
+                                Terms of Use
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<button id="backToTop"
+    class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 bg-orange-600 text-white w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 shadow-lg hidden hover:bg-blue-900 hover:scale-110 hover:shadow-xl transition-all duration-300 z-50 items-center justify-center">
+    <i class="fas fa-arrow-up text-sm sm:text-base"></i>
+</button>
+
+<script>
+    // Back to top functionality
+    const backToTopBtn = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.remove('hidden');
+            backToTopBtn.classList.add('flex');
+        } else {
+            backToTopBtn.classList.add('hidden');
+            backToTopBtn.classList.remove('flex');
+        }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // Redirect placeholder links to custom 404
+    (function() {
+        const fallbackUrl = "https://lms.lilit.lk/404";
+        document.addEventListener('click', (event) => {
+            const link = event.target.closest('a');
+            if (!link) return;
+
+            const hrefValue = (link.getAttribute('href') || '').trim().toLowerCase();
+            const isPlaceholder = !hrefValue || hrefValue === '#' || hrefValue === 'javascript:void(0)' || hrefValue === 'javascript:void(0);';
+
+            if (isPlaceholder) {
+                event.preventDefault();
+                window.location.href = fallbackUrl;
+            }
+        });
+    })();
+</script><!-- WhatsApp Contact Button -->
+<div class="fixed bottom-[80px] right-4 sm:right-6 md:bottom-[90px] md:right-8 z-[9999] transition-all duration-300 ease-in-out">
+    <a href="https://wa.me/94704388434" target="_blank" class="group flex items-center justify-center bg-[#25D366] text-white w-10 h-10 text-center shadow-[0_5px_15px_rgba(37,211,102,0.3)] no-underline transition-all duration-300 ease-in-out relative overflow-hidden hover:bg-[#128C7E] hover:-translate-y-[3px] hover:shadow-[0_8px_20px_rgba(37,211,102,0.4)] hover:w-40 hover:rounded-[50px]">
+        <i class="ri-whatsapp-line text-[30px] absolute left-[6px] transition-all duration-300 ease-in-out group-hover:left-[15px]"></i>
+        <span class="opacity-0 w-0 transition-all duration-300 ease-in-out font-semibold text-sm ml-[10px] whitespace-nowrap group-hover:opacity-100 group-hover:w-auto group-hover:ml-[35px] group-hover:pr-[15px]">
+            Contact Us
+        </span>
+    </a>
+</div>
+
+<style>
+    /* Card Hover Effects */
+    .course-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .course-card:hover {
+        transform: translateY(-8px);
+    }
+
+    .course-card:hover .card-image {
+        transform: scale(1.05);
+    }
+
+    .card-image {
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Button Gradient */
+    .btn-gradient {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-gradient:hover::before {
+        left: 100%;
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+    }
+
+    /* Line Clamp */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Filter Tag Styles */
+    .filter-tag {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Loading Animation */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+
+    /* Search Clear Button */
+    #searchClear:hover i {
+        color: #4b5563;
+    }
+</style>
+
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50
+    });
+
+    // Search and Filter Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const courseCards = document.querySelectorAll('.course-card');
+        const courseSearch = document.getElementById('courseSearch');
+        const searchClear = document.getElementById('searchClear');
+        const sortBy = document.getElementById('sortBy');
+        const resetFilters = document.getElementById('resetFilters');
+        const courseCount = document.getElementById('courseCount');
+        const filteredText = document.getElementById('filteredText');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        const activeFilters = document.getElementById('activeFilters');
+        const filterTags = document.getElementById('filterTags');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const coursesGrid = document.getElementById('coursesGrid');
+
+        let debounceTimer;
+
+        // Show/Hide search clear button
+        courseSearch.addEventListener('input', function() {
+            searchClear.classList.toggle('hidden', this.value === '');
+        });
+
+        // Clear search input
+        searchClear.addEventListener('click', function() {
+            courseSearch.value = '';
+            searchClear.classList.add('hidden');
+            filterCourses();
+        });
+
+        // Filter functions
+        function filterCourses() {
+            clearTimeout(debounceTimer);
+            
+            // Show loading indicator
+            loadingIndicator.classList.remove('hidden');
+            
+            debounceTimer = setTimeout(() => {
+                const searchTerm = courseSearch.value.toLowerCase();
+                const selectedSort = sortBy.value;
+                
+                let visibleCount = 0;
+                let filteredCards = [];
+                
+                // Filter cards
+                courseCards.forEach(card => {
+                    const title = card.dataset.title;
+                    const description = card.dataset.description;
+                    
+                    let matchesSearch = true;
+                    
+                    // Search filter
+                    if (searchTerm) {
+                        matchesSearch = title.includes(searchTerm) || 
+                                       description.includes(searchTerm);
+                    }
+                    
+                    if (matchesSearch) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                        filteredCards.push(card);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Sort cards
+                sortCards(filteredCards, selectedSort);
+                
+                // Update UI
+                updateFilteredUI(visibleCount, searchTerm);
+                updateActiveFilters(searchTerm);
+                
+                // Hide loading indicator
+                loadingIndicator.classList.add('hidden');
+            }, 300);
+        }
+
+        // Sort cards function
+        function sortCards(cards, sortType) {
+            const grid = document.querySelector('#coursesGrid');
+            cards.sort((a, b) => {
+                switch(sortType) {
+                    case 'newest':
+                        return b.dataset.date - a.dataset.date;
+                    case 'oldest':
+                        return a.dataset.date - b.dataset.date;
+                    case 'name_asc':
+                        return a.dataset.title.localeCompare(b.dataset.title);
+                    case 'name_desc':
+                        return b.dataset.title.localeCompare(a.dataset.title);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Reorder cards in DOM
+            cards.forEach(card => {
+                grid.appendChild(card);
+            });
+        }
+
+        // Update filtered UI
+        function updateFilteredUI(count, searchTerm) {
+            courseCount.textContent = count;
+            
+            if (count === 0) {
+                filteredText.textContent = 'courses found';
+                noResultsMessage.classList.remove('hidden');
+                coursesGrid.classList.add('opacity-50');
+            } else {
+                filteredText.textContent = count === 1 ? 'course' : 'courses';
+                noResultsMessage.classList.add('hidden');
+                coursesGrid.classList.remove('opacity-50');
+            }
+            
+            // Update filtered text
+            if (searchTerm) {
+                filteredText.textContent += ` matching "${searchTerm}"`;
+            }
+        }
+
+        // Update active filters display
+        function updateActiveFilters(searchTerm) {
+            filterTags.innerHTML = '';
+            let hasActiveFilters = false;
+            
+            if (searchTerm) {
+                hasActiveFilters = true;
+                filterTags.innerHTML += `
+                    <div class="filter-tag">
+                        Search: "${searchTerm}"
+                        <i class="ri-close-line cursor-pointer hover:text-orange-200" onclick="clearSearch()"></i>
+                    </div>
+                `;
+            }
+            
+            activeFilters.classList.toggle('hidden', !hasActiveFilters);
+        }
+
+        // Clear search function (exposed globally)
+        window.clearSearch = function() {
+            courseSearch.value = '';
+            searchClear.classList.add('hidden');
+            filterCourses();
+        };
+
+        // Event listeners
+        courseSearch.addEventListener('input', filterCourses);
+        sortBy.addEventListener('change', filterCourses);
+        
+        // Reset all filters
+        resetFilters.addEventListener('click', function() {
+            courseSearch.value = '';
+            sortBy.value = 'newest';
+            searchClear.classList.add('hidden');
+            filterCourses();
+        });
+
+        // Initial filter
+        filterCourses();
+    });
+</script>
