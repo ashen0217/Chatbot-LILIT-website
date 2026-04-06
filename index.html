@@ -533,7 +533,7 @@
 
         try {
           // 3. Send to Python Server
-          const response = await fetch("/chat", {
+          const response = await fetch("https://chatbot-lilit-website.onrender.com/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ question: question }),
