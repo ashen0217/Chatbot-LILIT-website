@@ -75,7 +75,17 @@ INSTRUCTIONS:
 
 4. **Completeness:** Do not give short answers. If you find the info, give the full details found in the text files.
 
-5. **CONCISENESS FOR MISSION & VISION:** If the user asks for the "Vision" or "Mission", provide ONLY the exact short statement. Do NOT add extra paragraphs, history, or educational philosophy from other texts.
+5. **VISION & MISSION (CRITICAL - 100% ACCURACY):** If the user asks for "Vision", "දැක්ම", "Mission", or "ප්‍රතිපත්තිය":
+   - Search the context VERY CAREFULLY for the COMPLETE vision or mission statement
+   - Return the FULL, EXACT text - do NOT summarize or shorten it
+   - If asked in Sinhala, provide the Sinhala version; if asked in English, provide the English version
+   - The vision/mission statements can be multiple sentences long - include ALL of them
+
+6. **OBJECTIVES (CRITICAL - 100% ACCURACY):** If the user asks for "Objectives", "Goals", "Aims", "අරමුණු":
+   - Provide the COMPLETE list of ALL objectives
+   - Each objective should include its title and full description
+   - Do NOT truncate or summarize - give the complete content
+   - Respond in the same language as the question
 
 HELPFUL ANSWER:"""
 
@@ -229,6 +239,59 @@ Learn to create videos, graphics, and content using the latest AI technology.
     cache.set(cache_key, hardcoded_data)
     return hardcoded_data
 
+def get_vision_mission_data():
+    """Return hardcoded vision/mission statements for 100% accuracy"""
+    return {
+        "vision_sinhala": "රාජ්‍ය නිලධාරීන්ගේ එදිනෙදා කාර්යාලීය කටයුතු වඩාත් කාර්යක්ෂම කරගැනීම සහ මහජනතාව වෙත වඩාත් කාර්යක්ෂම, කඩිනම් සහ ගුණාත්මක සේවාවක් ලබා දීම උදෙසා කෘත්‍රිම බුද්ධිය ප්‍රායෝගිකව භාවිතා කරන ආකාරය පිළිබඳව පුහුණුවක් ලබා දීමයි.",
+        "vision_english": "To become a leading educational institution that nurtures citizens enriched with knowledge, skills, values, and attitudes, while staying updated with the ever-evolving world.",
+        "mission_english": "To revolutionize education through innovative technology solutions that empower institutions, educators, and students to achieve their full potential.",
+    }
+
+def get_objectives_data():
+    """Return hardcoded objectives data for 100% accuracy"""
+    return {
+        "objectives_english": """**Excellence in Education**
+To create an excellent educational environment enriched with knowledge, skills, values, and attitudes, fostering well-rounded citizens.
+
+**Technological Innovation**
+To integrate cutting-edge technology and innovative teaching methods that keep pace with the rapidly evolving digital world.
+
+**Student Empowerment**
+To empower students with practical skills and theoretical knowledge that prepare them for successful careers in their chosen fields.
+
+**Accessibility and Affordability**
+To provide high-quality education at affordable rates, making learning accessible to students from all backgrounds.
+
+**Industry-Relevant Training**
+To offer courses aligned with current industry demands, ensuring graduates are job-ready and competitive in the market.
+
+**Continuous Learning**
+To promote lifelong learning and professional development through flexible course structures and up-to-date curriculum.
+
+**Community Development**
+To contribute to the development of the local and national community by producing skilled, ethical, and responsible graduates.""",
+        "objectives_sinhala": """**අධ්‍යාපනයේ උසස් බව**
+දැනුම, කුසලතා, වටිනාකම් සහ ආකල්ප වලින් පොහොසත් වූ විශිෂ්ට අධ්‍යාපන පරිසරයක් නිර්මාණය කිරීම.
+
+**තාක්ෂණික නවෝත්පාදන**
+වේගයෙන් වර්ධනය වන ඩිජිටල් ලෝකය සමඟ පා එකට තබමින් අති නවීන තාක්ෂණය සහ නව්‍ය ඉගැන්වීම් ක්‍රම ඒකාබද්ධ කිරීම.
+
+**ශිෂ්‍ය සවිබල ගැන්වීම**
+තෝරාගත් ක්ෂේත්‍රවල සාර්ථක වෘත්තීන් සඳහා සූදානම් කරන ප්‍රායෝගික කුසලතා සහ න්‍යායාත්මක දැනුම සමඟ සිසුන් සවිබල ගැන්වීම.
+
+**ප්‍රවේශය සහ දැරිය හැකි මිල**
+සෑම පසුබිමකින්ම සිසුන්ට ඉගෙනීම ප්‍රවේශ විය හැකි ලෙස දැරිය හැකි මිලකට උසස් තත්ත්වයේ අධ්‍යාපනය ලබා දීම.
+
+**කර්මාන්තයට අදාළ පුහුණුව**
+වර්තමාන කර්මාන්ත ඉල්ලුම් වලට අනුකූලව පාඨමාලා ඉදිරිපත් කිරීම, උපාධිධාරීන් රැකියා සඳහා සූදානම් වන බව සහතික කිරීම.
+
+**අඛණ්ඩ ඉගෙනීම**
+නම්‍යශීලී පාඨමාලා ව්‍යූහ සහ යාවත්කාලීන විෂය මාලාව හරහා ජීවිත කාලය පුරාවටම ඉගෙනීම සහ වෘත්තීය සංවර්ධනය ප්‍රවර්ධනය කිරීම.
+
+**ප්‍රජා සංවර්ධනය**
+දක්ෂ, ආචාර ධාර්මික සහ වගකිවයුතු උපාධිධාරීන් නිෂ්පාදනය කිරීමෙන් දේශීය සහ ජාතික ප්‍රජාවේ සංවර්ධනයට දායක වීම."""
+    }
+
 async def get_objectives_context():
     """Fetch objectives from About page with caching"""
     cached = cache.get("objectives")
@@ -269,19 +332,103 @@ async def chat(payload: ChatRequest):
                 yield "data: [DONE]\n\n"
                 return
 
-            # 2. Intercept Objectives query
-            if re.search(r'\b(objective|objectives|aim|aims|goal|goals)\b', q_lower):
-                objectives_text = await get_objectives_context()
-                if objectives_text:
-                    prompt = (
-                        "You are a helpful assistant for LILIT LMS. Extract ALL objectives from the following text and present them clearly.\n"
-                        "For each objective: **Title** + brief description. Separate each with a blank line.\n\n"
-                        f"RAW CONTENT:\n{objectives_text[:3000]}"  # Limit context size
-                    )
+            # 2. Intercept Objectives query with hardcoded data for accuracy
+            if re.search(r'\b(objective|objectives|aim|aims|goal|goals|අරමුණු)\b', q_lower):
+                objectives_data = get_objectives_data()
+                
+                # Detect language
+                is_sinhala = bool(re.search(r'[ක-ෆ]', payload.question))
+                
+                # Return exact hardcoded objectives
+                if is_sinhala:
+                    answer = objectives_data["objectives_sinhala"]
+                else:
+                    answer = objectives_data["objectives_english"]
+                
+                # Stream the hardcoded answer
+                yield f"data: {json.dumps({'token': answer})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+            
+            # 2.1 Intercept "About" queries with comprehensive information
+            if re.search(r'\b(about|about us|about lilit|ලිලිට් ගැන|අප ගැන)\b', q_lower):
+                # Detect language
+                is_sinhala = bool(re.search(r'[ක-ෆ]', payload.question))
+                
+                # Get all About data
+                vm_data = get_vision_mission_data()
+                obj_data = get_objectives_data()
+                
+                if is_sinhala:
+                    about_info = f"""**ලිලිට් LMS ගැන**
+
+**දැක්ම:**
+{vm_data['vision_sinhala']}
+
+**අරමුණු:**
+{obj_data['objectives_sinhala']}
+
+**සම්බන්ධ විය හැකි විස්තර:**
+- Hotline: +94 70 438 8464
+- Help Line: +94 71 661 6699
+- Email: info@lilit.lk
+- Address: D/263/2, Magammana, Dehiowita."""
+                else:
+                    about_info = f"""**About LILIT LMS**
+
+**Vision:**
+{vm_data['vision_english']}
+
+**Mission:**
+{vm_data['mission_english']}
+
+**Objectives:**
+{obj_data['objectives_english']}
+
+**Contact Information:**
+- Hotline: +94 70 438 8464
+- Help Line: +94 71 661 6699
+- Email: info@lilit.lk
+- Address: D/263/2, Magammana, Dehiowita."""
+                
+                yield f"data: {json.dumps({'token': about_info})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
+            # 2.5 Intercept Vision/Mission queries with 100% accuracy
+            if re.search(r'\b(vision|mission|දැක්ම|ප්‍රතිපත්තිය)\b', q_lower):
+                # Get hardcoded data for 100% accuracy
+                vm_data = get_vision_mission_data()
+                
+                # Determine what user is asking for
+                is_vision = bool(re.search(r'\b(vision|දැක්ම)\b', q_lower))
+                is_sinhala = bool(re.search(r'[ක-ෆ]', payload.question))  # Detect Sinhala characters
+                
+                # Return exact hardcoded answer
+                if is_vision and is_sinhala:
+                    answer = vm_data["vision_sinhala"]
+                elif is_vision and not is_sinhala:
+                    answer = vm_data["vision_english"]
+                elif not is_vision and not is_sinhala:
+                    answer = vm_data["mission_english"]
+                else:
+                    # Mission in Sinhala - fetch from context since we don't have it hardcoded
+                    about_text = await get_objectives_context()
+                    prompt = f"""The user asked: "{payload.question}"
+
+Context from LILIT:
+{about_text}
+
+The user is asking for the MISSION in SINHALA. Search the context carefully and return the complete mission statement in Sinhala. Return ONLY the mission statement."""
                     async for chunk in llm.astream(prompt):
                         yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                     yield "data: [DONE]\n\n"
                     return
+                
+                # Stream the hardcoded answer
+                yield f"data: {json.dumps({'token': answer})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
 
             # 3. Intercept News query
             if re.search(r'\b(news|events|latest updates|happening)\b', q_lower):
