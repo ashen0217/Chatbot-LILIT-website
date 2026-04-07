@@ -215,12 +215,6 @@ DURATION: 6 months
 COURSE FEE: LKR 30,000
 Comprehensive web development program covering HTML, CSS, JavaScript, and modern frameworks.
 
-=== COURSE ID: 6 ===
-AI Study
-DURATION: 4 days
-COURSE FEE: LKR 100
-Short intensive course to learn fundamental AI concepts and applications.
-
 === COURSE ID: 7 ===
 AI Content Creation
 DURATION: Flexible
