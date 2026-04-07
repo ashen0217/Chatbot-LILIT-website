@@ -283,149 +283,116 @@ async def chat(payload: ChatRequest):
                     yield "data: [DONE]\n\n"
                     return
 
-        # 3. Intercept News query
-        if re.search(r'\b(news|events|latest updates|happening)\b', q_lower):
-            news_text = await get_live_news_context()
-            if news_text:
-                prompt = (
-                    "You are a helpful assistant for LILIT LMS. The user is asking for the latest news. "
-                    "Extract ALL the news and events from the following text and present them in a highly organized, bulleted list.\n"
-                    "For EACH news item, provide the Title in **bold**, followed by the Date, Time (if any), and Author (if any).\n"
-                    "Provide an empty line between each news item.\n\n"
-                    f"RAW CONTENT FROM WEBSITE:\n{news_text}"
-                )
-                ai_msg = llm.invoke(prompt)
-                return {"answer": ai_msg.content}
+            # 3. Intercept News query
+            if re.search(r'\b(news|events|latest updates|happening)\b', q_lower):
+                news_text = await get_live_news_context()
+                if news_text:
+                    prompt = (
+                        "You are a helpful assistant for LILIT LMS. Extract ALL news items as a bulleted list.\n"
+                        "For each: **Title** (bold), Date, Time, Author. Separate each with a blank line.\n\n"
+                        f"RAW CONTENT:\n{news_text[:3000]}"  # Limit context size
+                    )
+                    async for chunk in llm.astream(prompt):
+                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                    yield "data: [DONE]\n\n"
+                    return
 
-        # 4. Intercept SPECIFIC Course Queries
-        if re.search(r'\b(ai for all|ai.for.all|certificate.ai.for.all|e-certificate ai)\b', q_lower):
-            course_text = await get_course_details_by_id(2)
-            if course_text:
-                prompt = (
-                    "You are a helpful assistant for LILIT LMS. The user is asking about the 'e-Certificate AI for All' course ONLY.\n"
-                    "Extract the complete details for THIS SPECIFIC COURSE from the following text.\n"
-                    "Include EACH of these (search the entire text carefully):\n"
-                    "- **Course Name** (in bold)\n"
-                    "- Duration (e.g., '4 Days')\n"
-                    "- Course Fee in LKR (search for 'LKR', 'price', or 'fee')\n"
-                    "- Comprehensive Overview (2-3 sentences about what the course teaches)\n\n"
-                    "IMPORTANT: Only provide information about AI for All. Do NOT include other courses.\n"
-                    "Do NOT say 'Not specified' - search thoroughly before claiming something is missing.\n\n"
-                    f"RAW COURSE DATA:\n{course_text}"
-                )
-                ai_msg = llm.invoke(prompt)
-                return {"answer": ai_msg.content}
+            # 4. Intercept SPECIFIC Course Queries - Let LLM handle with proper language support
+            if re.search(r'\b(ai for all|ai.for.all|certificate.ai.for.all|e-certificate ai)\b', q_lower):
+                course_text = await get_all_course_details()
+                prompt = f"""The user asked: "{payload.question}"
 
-        if re.search(r'\b(content creation|ai content|e-certificate ai content)\b', q_lower):
-            course_text = await get_course_details_by_id(7)
-            if course_text:
-                prompt = (
-                    "You are a helpful assistant for LILIT LMS. The user is asking about the 'AI Content Creation' course ONLY.\n"
-                    "Extract the complete details for THIS SPECIFIC COURSE from the following text.\n"
-                    "Include EACH of these (search the entire text carefully):\n"
-                    "- **Course Name** (in bold)\n"
-                    "- Duration (search for day/month information)\n"
-                    "- Course Fee in LKR (search for 'LKR', 'price', 'cost', or 'fee')\n"
-                    "- Comprehensive Overview (2-3 sentences about the course and what learners will develop)\n\n"
-                    "IMPORTANT: Only provide information about AI Content Creation. Do NOT include other courses.\n"
-                    "Do NOT say 'Not specified' - search thoroughly before claiming something is missing.\n\n"
-                    f"RAW COURSE DATA:\n{course_text}"
-                )
-                ai_msg = llm.invoke(prompt)
-                return {"answer": ai_msg.content}
+Course Information:
+{course_text}
 
-        if re.search(r'\b(web design|wordpress|web design wordpress)\b', q_lower):
-            course_text = await get_course_details_by_id(3)
-            if course_text:
-                prompt = (
-                    "You are a helpful assistant for LILIT LMS. The user is asking about the 'Web Design WordPress with AI' course ONLY.\n"
-                    "Extract the complete details for THIS SPECIFIC COURSE from the following text.\n"
-                    "Include EACH of these (search the entire text carefully):\n"
-                    "- **Course Name** (in bold)\n"
-                    "- Duration (e.g., '2 months')\n"
-                    "- Course Fee in LKR (search for 'LKR', 'price', or 'fee')\n"
-                    "- Comprehensive Overview (2-3 sentences about what the course teaches and technologies used)\n\n"
-                    "IMPORTANT: Only provide information about Web Design WordPress. Do NOT include other courses.\n"
-                    "Do NOT say 'Not specified' - search thoroughly before claiming something is missing.\n\n"
-                    f"RAW COURSE DATA:\n{course_text}"
-                )
-                ai_msg = llm.invoke(prompt)
-                return {"answer": ai_msg.content}
+Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English. 
+Extract information about "AI for All" course and format it clearly with: Name, Duration, Fee, and Overview."""
+                async for chunk in llm.astream(prompt):
+                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
 
-        if re.search(r'\b(arduino|robotics|future robotics)\b', q_lower):
-            course_text = await get_course_details_by_id(4)
-            if course_text:
-                prompt = (
-                    "You are a helpful assistant for LILIT LMS. The user is asking about the 'Arduino With Future Robotics' course ONLY.\n"
-                    "Extract the complete details for THIS SPECIFIC COURSE from the following text.\n"
-                    "Include EACH of these (search the entire text carefully):\n"
-                    "- **Course Name** (in bold)\n"
-                    "- Duration (e.g., '3 months')\n"
-                    "- Course Fee in LKR (search for 'LKR', 'price', or 'fee')\n"
-                    "- Comprehensive Overview (2-3 sentences about what the course teaches - robotics, electronics, programming)\n\n"
-                    "IMPORTANT: Only provide information about Arduino/Robotics. Do NOT include other courses.\n"
-                    "Do NOT say 'Not specified' - search thoroughly before claiming something is missing.\n\n"
-                    f"RAW COURSE DATA:\n{course_text}"
-                )
-                ai_msg = llm.invoke(prompt)
-                return {"answer": ai_msg.content}
+            if re.search(r'\b(content creation|ai content|e-certificate ai content)\b', q_lower):
+                course_text = await get_all_course_details()
+                prompt = f"""The user asked: "{payload.question}"
 
-        if re.search(r'\b(web development|national certificate|nvq|web dev)\b', q_lower):
-            course_text = await get_course_details_by_id(5)
-            if course_text:
-                prompt = (
-                    "You are a helpful assistant for LILIT LMS. The user is asking about the 'National Certificate in Web Development' course ONLY.\n"
-                    "Extract the complete details for THIS SPECIFIC COURSE from the following text.\n"
-                    "Include EACH of these (search the entire text carefully):\n"
-                    "- **Course Name** (in bold)\n"
-                    "- Duration (e.g., '6 months')\n"
-                    "- Course Fee in LKR (search for 'LKR', 'price', or 'fee')\n"
-                    "- Comprehensive Overview (2-3 sentences about the curriculum - web development, HTML, CSS, databases, etc.)\n\n"
-                    "IMPORTANT: Only provide information about Web Development/National Certificate. Do NOT include other courses.\n"
-                    "Do NOT say 'Not specified' - search thoroughly before claiming something is missing.\n\n"
-                    f"RAW COURSE DATA:\n{course_text}"
-                )
-                ai_msg = llm.invoke(prompt)
-                return {"answer": ai_msg.content}
+Course Information:
+{course_text}
 
-        # 5. Intercept GENERAL Course Query
-        if re.search(r'\b(course details|course fees|all courses|available courses|what courses|list courses|courses offered|your courses)\b', q_lower):
-            course_text = await get_all_course_details()
-            if course_text:
-                prompt = (
-                    "You are a helpful assistant for LILIT LMS. Extract ALL course information from the website content.\n\n"
-                    "CRITICAL EXTRACTION INSTRUCTIONS:\n"
-                    "1. Search VERY CAREFULLY for Duration information:\n"
-                    "   - Look for patterns like '6 months', '2 months', '4 days', '3 months', etc.\n"
-                    "   - Search for words: 'duration', 'months', 'days', 'weeks'\n"
-                    "   - If found, extract exactly as written (e.g., '6 months')\n\n"
-                    "2. Search VERY CAREFULLY for Course Fee/Price:\n"
-                    "   - Look for 'LKR', 'Rs.', 'Price:', 'Cost:', 'Fee:'\n"
-                    "   - Search for numerical amounts like '4,500', '30,000', 'LKR 100'\n"
-                    "   - If found, extract exactly (e.g., 'LKR 4,500')\n\n"
-                    "3. For Overview/Description:\n"
-                    "   - Find 2-3 sentences describing what the course teaches\n"
-                    "   - Look for phrases like 'course teaches', 'learn', 'cover', 'master', 'develop skills'\n\n"
-                    "4. FORMATTING:\n"
-                    "   - For each course, use this format:\n"
-                    "   **Course Name**\n"
-                    "   - Duration: [value found in text]\n"
-                    "   - Course Fee: [value found in text]\n"
-                    "   - Overview: [2-3 sentence description]\n\n"
-                    "5. CRITICAL - Do NOT use 'Not specified':\n"
-                    "   - If you truly cannot find Duration after searching the entire text for months/days/weeks, only then skip it\n"
-                    "   - If you truly cannot find Fee after searching for LKR/Rs/Price/Cost, only then skip it\n"
-                    "   - If you cannot find Overview, provide at least the course title and what you can find\n\n"
-                    "6. Blank lines between courses\n\n"
-                    f"WEBSITE COURSE DATA:\n{course_text}"
-                )
-                ai_msg = llm.invoke(prompt)
-                return {"answer": ai_msg.content}
+Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
+Extract information about "AI Content Creation" course and format it clearly with: Name, Duration, Fee, and Overview."""
+                async for chunk in llm.astream(prompt):
+                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
 
-        # 6. Standard Database Query
-        response = qa_chain.invoke(payload.question)
-        return {"answer": response}
-        
-    except Exception as e:
-        print(f"Error: {e}")
-        return {"answer": "I am having trouble accessing my database."}
+            if re.search(r'\b(web design|wordpress|web design wordpress)\b', q_lower):
+                course_text = await get_all_course_details()
+                prompt = f"""The user asked: "{payload.question}"
+
+Course Information:
+{course_text}
+
+Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
+Extract information about "Web Design WordPress with AI" course and format it clearly with: Name, Duration, Fee, and Overview."""
+                async for chunk in llm.astream(prompt):
+                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
+            if re.search(r'\b(arduino|robotics|future robotics)\b', q_lower):
+                course_text = await get_all_course_details()
+                prompt = f"""The user asked: "{payload.question}"
+
+Course Information:
+{course_text}
+
+Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
+Extract information about "Arduino With Future Robotics" course and format it clearly with: Name, Duration, Fee, and Overview."""
+                async for chunk in llm.astream(prompt):
+                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
+            if re.search(r'\b(web development|national certificate|nvq|web dev)\b', q_lower):
+                course_text = await get_all_course_details()
+                prompt = f"""The user asked: "{payload.question}"
+
+Course Information:
+{course_text}
+
+Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
+Extract information about "National Certificate in Web Development" course and format it clearly with: Name, Duration, Fee, and Overview."""
+                async for chunk in llm.astream(prompt):
+                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
+            # 5. Intercept GENERAL Course Query - Use hardcoded data with language support
+            if re.search(r'\b(course details|course fees|all courses|available courses|what courses|list courses|courses offered|your courses)\b', q_lower):
+                course_text = await get_all_course_details()
+                prompt = f"""The user asked: "{payload.question}"
+
+Course Information:
+{course_text}
+
+IMPORTANT: Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
+
+Extract and format all course information clearly. For each course: **Name**, Duration, Fee, Overview. Separate with blank lines."""
+                async for chunk in llm.astream(prompt):
+                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
+            # 6. Standard Database Query - Stream the response
+            async for chunk in qa_chain.astream(payload.question):
+                yield f"data: {json.dumps({'token': chunk})}\n\n"
+            yield "data: [DONE]\n\n"
+            
+        except Exception as e:
+            print(f"Error: {e}")
+            error_msg = "I am having trouble accessing my database."
+            yield f"data: {json.dumps({'token': error_msg})}\n\n"
+            yield "data: [DONE]\n\n"
+    
+    return StreamingResponse(generate_stream(), media_type="text/event-stream")
