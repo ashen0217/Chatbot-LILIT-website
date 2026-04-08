@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import json
 
+
 # --- LangChain Imports ---
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS  
@@ -75,7 +76,7 @@ INSTRUCTIONS:
 
 4. **Completeness:** Do not give short answers. If you find the info, give the full details found in the text files.
 
-5. **VISION & MISSION (CRITICAL - 100% ACCURACY):** If the user asks for "Vision", "දැක්ම", "Mission", or "ප්‍රතිපත්තිය":
+5. **VISION & MISSION (CRITICAL - 100% ACCURACY):** If the user asks for "Vision", "දැක්ම", "Mission", or "ප්‍රතිපත්තිය", or "මෙහෙවර":
    - Search the context VERY CAREFULLY for the COMPLETE vision or mission statement
    - Return the FULL, EXACT text - do NOT summarize or shorten it
    - If asked in Sinhala, provide the Sinhala version; if asked in English, provide the English version
@@ -242,9 +243,10 @@ Learn to create videos, graphics, and content using the latest AI technology.
 def get_vision_mission_data():
     """Return hardcoded vision/mission statements for 100% accuracy"""
     return {
-        "vision_sinhala": "රාජ්‍ය නිලධාරීන්ගේ එදිනෙදා කාර්යාලීය කටයුතු වඩාත් කාර්යක්ෂම කරගැනීම සහ මහජනතාව වෙත වඩාත් කාර්යක්ෂම, කඩිනම් සහ ගුණාත්මක සේවාවක් ලබා දීම උදෙසා කෘත්‍රිම බුද්ධිය ප්‍රායෝගිකව භාවිතා කරන ආකාරය පිළිබඳව පුහුණුවක් ලබා දීමයි.",
+        "vision_sinhala": "දැනුම, කුසලතා, අගයයන් සහ හැසිරීම් වලින් පරිපූර්ණ පුරවැසියන් බිහි කරන ප්‍රමුඛ අධ්‍යාපන ආයතනයක් බවට පත්වීමත්, නිතරම පරිවර්තනය වන ලෝකය සමග යාවත්කාලීනව සිටීමත් සඳහා.",
         "vision_english": "To become a leading educational institution that nurtures citizens enriched with knowledge, skills, values, and attitudes, while staying updated with the ever-evolving world.",
         "mission_english": "To revolutionize education through innovative technology solutions that empower institutions, educators, and students to achieve their full potential.",
+        "mission_sinhala": "අපේ මෙහෙවර වන්නේ නවීන තාක්ෂණ විසඳුම් ඔස්සේ අධ්‍යාපනය ප්‍රතිවිප්ලවීය කිරීමයි, එමඟින් ආයතන, අධ්‍යාපකයින් සහ සිසුන් තම සම්පූර්ණ හැකියාවන් දක්වමින් සාර්ථක වීමට හැකි වීමයි.",
     }
 
 def get_objectives_data():
@@ -396,7 +398,7 @@ async def chat(payload: ChatRequest):
                 return
 
             # 2.5 Intercept Vision/Mission queries with 100% accuracy
-            if re.search(r'\b(vision|mission|දැක්ම|ප්‍රතිපත්තිය)\b', q_lower):
+            if re.search(r'\b(vision|mission|දැක්ම|ප්‍රතිපත්තිය|මෙහෙවර)\b', q_lower):
                 # Get hardcoded data for 100% accuracy
                 vm_data = get_vision_mission_data()
                 
@@ -412,18 +414,8 @@ async def chat(payload: ChatRequest):
                 elif not is_vision and not is_sinhala:
                     answer = vm_data["mission_english"]
                 else:
-                    # Mission in Sinhala - fetch from context since we don't have it hardcoded
-                    about_text = await get_objectives_context()
-                    prompt = f"""The user asked: "{payload.question}"
-
-Context from LILIT:
-{about_text}
-
-The user is asking for the MISSION in SINHALA. Search the context carefully and return the complete mission statement in Sinhala. Return ONLY the mission statement."""
-                    async for chunk in llm.astream(prompt):
-                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
-                    yield "data: [DONE]\n\n"
-                    return
+                    # Mission in Sinhala - use hardcoded data
+                    answer = vm_data["mission_sinhala"]
                 
                 # Stream the hardcoded answer
                 yield f"data: {json.dumps({'token': answer})}\n\n"
