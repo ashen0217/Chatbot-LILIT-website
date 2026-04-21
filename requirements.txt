@@ -7,5 +7,7 @@ langchain
 langchain-community
 langchain-openai
 openai
-faiss-cpu
 pypdf
+slowapi
+pinecone-client
+langchain-pinecone
