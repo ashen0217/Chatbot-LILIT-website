@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader, PyPDFLoader, WebBaseLoader
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_pinecone import PineconeVectorStore
 
 load_dotenv() 
  
@@ -108,40 +108,51 @@ def build_knowledge_base():
         print("❌ CRITICAL ERROR: Documents were loaded, but no text could be extracted.")
         return
 
-    # --- 5. FAISS UPLOAD ---
-    # Updated print statement to reflect OpenAI
-    print("   ... 💾 Saving to FAISS Database (using OpenAI)...")
+    # --- 5. PINECONE UPLOAD ---
+    print("   ... 💾 Saving to Pinecone Database (using OpenAI)...")
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    index_name = os.getenv("PINECONE_INDEX_NAME", "lilit-lms")
     
+    from pinecone import Pinecone, ServerlessSpec
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    
+    if index_name not in pc.list_indexes().names():
+        print(f"   ... 🛠️ Creating Pinecone index '{index_name}'...")
+        try:
+            pc.create_index(
+                name=index_name,
+                dimension=1536,
+                metric="cosine",
+                spec=ServerlessSpec(
+                    cloud="aws",
+                    region="us-east-1"
+                )
+            )
+            while not pc.describe_index(index_name).status['ready']:
+                time.sleep(1)
+            print("   ... ✅ Index created successfully.")
+        except Exception as e:
+            print(f"❌ Error creating index: {e}\nPlease create the '{index_name}' index manually in the Pinecone dashboard with dimension 1536.")
+            return
+            
     batch_size = 20
-    vectorstore = None
+    vectorstore = PineconeVectorStore(index_name=index_name, embedding=embeddings)
     
     for i in range(0, len(all_splits), batch_size):
         batch = all_splits[i : i + batch_size]
         try:
-            if vectorstore is None:
-                vectorstore = FAISS.from_documents(batch, embeddings)
-            else:
-                vectorstore.add_documents(batch)
+            vectorstore.add_documents(batch)
             print(f"       ✅ Indexed {i+len(batch)}/{len(all_splits)} chunks")
         except Exception as e:
             print(f"       ⚠️ Quota hit. Waiting 10s... (Error: {e})")
             time.sleep(10)
             try:
-                if vectorstore is None:
-                    vectorstore = FAISS.from_documents(batch, embeddings)
-                else:
-                    vectorstore.add_documents(batch)
+                vectorstore.add_documents(batch)
                 print(f"       ✅ Recovered and indexed {i+len(batch)}/{len(all_splits)} chunks")
             except Exception as e2:
                 print(f"       ❌ Failed batch after waiting. Skipping. (Error: {e2})")
 
-    # --- 6. SAVE DB ---
-    if vectorstore is not None:
-        vectorstore.save_local("./faiss_db")
-        print("✅ SUCCESS: FAISS Indexing Complete! The faiss_db folder has been created.")
-    else:
-        print("❌ ERROR: Vectorstore was never created. Check API keys and quotas.")
+    print("✅ SUCCESS: Pinecone Indexing Complete!")
 
 if __name__ == "__main__":
     build_knowledge_base()
