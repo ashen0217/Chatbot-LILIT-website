@@ -418,7 +418,7 @@
               stroke="none"
               fill="currentColor"
             ></path>
-          </svg>          
+          </svg>
         </div>
         <div>
           <h3>Chutie Lilit</h3>
@@ -541,6 +541,12 @@
           // 4. Remove Typing Indicator
           if (document.getElementById(typingIndicator.id)) {
             document.getElementById(typingIndicator.id).remove();
+          }
+
+          // Check for Rate Limit Exceeded
+          if (response.status === 429) {
+            addMessage("Too many messages. Please wait a moment.", "bot-msg");
+            return;
           }
 
           // 5. Create Bot Message Container for Streaming
