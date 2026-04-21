@@ -71,7 +71,7 @@ def fetch_course_details(course_id):
             if duration_match:
                 course_data['duration'] = duration_match.group(0)
 
-        if 'lkr' in text.lower():
+        if 'lkr' in text.lower():     
             # Try to find LKR amount
             import re
             fee_match = re.search(r'(?:LKR|Rs\.?)\s*([\d,]+)', text, re.IGNORECASE)
