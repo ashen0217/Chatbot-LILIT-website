@@ -4,7 +4,6 @@ os.environ["USER_AGENT"] = "LILIT_Chatbot/1.0"
 
 import glob
 import time
-import shutil
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
@@ -40,11 +39,8 @@ def get_all_website_links(url):
 
 def build_knowledge_base():
     # Updated print statement
-    print("--- 🚀 Starting High-Efficiency FAISS Indexing (OpenAI) ---")
+    print("--- 🚀 Starting High-Efficiency Pinecone Indexing (OpenAI) ---")
     
-    if os.path.exists("./faiss_db"):
-        shutil.rmtree("./faiss_db")
-        print("   ... Old database cleared.")
 
     all_docs = []
 
