@@ -228,7 +228,7 @@ async def get_all_course_details():
     if cached is not None:
         return cached
 
-    # Hardcoded fallback data (always available)
+    
     hardcoded_data = """
 === COURSE ID: 2 ===
 e-Certificate AI for All
