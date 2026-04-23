@@ -517,6 +517,25 @@
         return div;
       }
 
+      async function fetchWithRetry(url, options, retries = 3, delayMs = 1000) {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+          try {
+            const response = await fetch(url, options);
+            return response;
+          } catch (err) {
+            const isNetworkError =
+              err.name === "TypeError" ||
+              (err.message && err.message.toLowerCase().includes("network"));
+            if (isNetworkError && attempt < retries) {
+              // Wait before retrying (exponential backoff)
+              await new Promise((res) => setTimeout(res, delayMs * attempt));
+              continue;
+            }
+            throw err;
+          }
+        }
+      }
+
       async function sendMessage() {
         const question = inputField.value.trim();
         if (!question) return;
@@ -531,12 +550,17 @@
         scrollToBottom();
 
         try {
-          // 3. Send to Python Server with Streaming
-          const response = await fetch("/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question: question }),
-          });
+          // 3. Send to Python Server with Streaming (with retry logic)
+          const response = await fetchWithRetry(
+            "/chat",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ question: question }),
+            },
+            3,    // up to 3 attempts
+            800   // 800ms base delay (grows to 1600ms, 2400ms)
+          );
 
           // 4. Remove Typing Indicator
           if (document.getElementById(typingIndicator.id)) {
@@ -545,7 +569,12 @@
 
           // Check for Rate Limit Exceeded
           if (response.status === 429) {
-            addMessage("Too many messages. Please wait a moment.", "bot-msg");
+            addMessage("Too many messages. Please wait a moment before sending another.", "bot-msg");
+            return;
+          }
+
+          if (!response.ok) {
+            addMessage(`Server error (${response.status}). Please try again.`, "bot-msg");
             return;
           }
 
@@ -590,7 +619,18 @@
           if (document.getElementById(typingIndicator.id)) {
             document.getElementById(typingIndicator.id).remove();
           }
-          addMessage("Error: Could not connect to server.", "bot-msg");
+          // Distinguish network errors from other errors
+          const isNetworkErr =
+            error.name === "TypeError" ||
+            (error.message && error.message.toLowerCase().includes("network"));
+          if (isNetworkErr) {
+            addMessage(
+              "⚠️ Network connection issue. Please check your internet and try again.",
+              "bot-msg"
+            );
+          } else {
+            addMessage("⚠️ Could not reach the server. Please try again shortly.", "bot-msg");
+          }
         }
       }
 
