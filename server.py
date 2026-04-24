@@ -48,11 +48,17 @@ print("... Loading Database ...")
 embedding_model_name = "text-embedding-3-small"
 embeddings = OpenAIEmbeddings(model=embedding_model_name)
 
-# Load Pinecone Database
+# Load Pinecone Database with error handling
 index_name = os.getenv("PINECONE_INDEX_NAME", "lilit-lms")
-vectorstore = PineconeVectorStore.from_existing_index(
-    index_name=index_name, embedding=embeddings
-)
+try:
+    vectorstore = PineconeVectorStore.from_existing_index(
+        index_name=index_name, embedding=embeddings
+    )
+    print(f"✓ Successfully loaded Pinecone index: {index_name}")
+except Exception as e:
+    print(f"⚠ Warning: Failed to load Pinecone index '{index_name}': {e}")
+    print("  Falling back to hardcoded data for responses.")
+    vectorstore = None
 
 # Setting up the OpenAI LLM (gpt-4o-mini)
 llm = ChatOpenAI(model="gpt-5-nano", temperature=0.3)
@@ -106,22 +112,24 @@ QA_CHAIN_PROMPT = PromptTemplate(
     input_variables=["context", "question"], template=template
 )
 
-# 2. SETUP CHAIN
-retriever = vectorstore.as_retriever(
-    search_kwargs={"k": 5}
-)  # Reduced from 10 to 5 for faster retrieval
+# 2. SETUP CHAIN - Only if vectorstore is available
+if vectorstore:
+    retriever = vectorstore.as_retriever(
+        search_kwargs={"k": 5}
+    )  # Reduced from 10 to 5 for faster retrieval
 
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
 
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
-
-
-qa_chain = (
-    {"context": retriever | format_docs, "question": RunnablePassthrough()}
-    | QA_CHAIN_PROMPT
-    | llm
-    | StrOutputParser()
-)
+    qa_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | QA_CHAIN_PROMPT
+        | llm
+        | StrOutputParser()
+    )
+else:
+    retriever = None
+    qa_chain = None
 
 
 class ChatRequest(BaseModel):
@@ -657,7 +665,7 @@ Extract information about "National Certificate in Web Development" course and f
 
             # 5. Intercept GENERAL Course Query - Use hardcoded data with language support
             if re.search(
-                r"\b(course details|course fees|all courses|available courses|what courses|list courses|courses offered|your courses)\b",
+                r"\b(courses?|course details|course fees|all courses|available courses|what courses|list courses|courses offered|your courses|offered courses)\b",
                 q_lower,
             ) or re.search(r"(පාඨමාලා විස්තර|පාඨමාලා ගාස්තු|සියලුම පාඨමාලා|පාඨමාලා මොනවාද|ඔබේ පාඨමාලා)", q_lower):
                 course_text = await get_all_course_details()
@@ -686,9 +694,14 @@ Extract and format all course information clearly. For each course: **Name**, Du
                 return
 
             # 7. Standard Database Query - Stream the response
-            async for chunk in qa_chain.astream(payload.question):
-                yield f"data: {json.dumps({'token': chunk})}\n\n"
-            yield "data: [DONE]\n\n"
+            if qa_chain:
+                async for chunk in qa_chain.astream(payload.question):
+                    yield f"data: {json.dumps({'token': chunk})}\n\n"
+                yield "data: [DONE]\n\n"
+            else:
+                error_msg = "I cannot access my knowledge base at the moment. Please try asking about specific courses, or visit https://lms.lilit.lk for more information."
+                yield f"data: {json.dumps({'token': error_msg})}\n\n"
+                yield "data: [DONE]\n\n"
 
         except Exception as e:
             print(f"Error: {e}")
