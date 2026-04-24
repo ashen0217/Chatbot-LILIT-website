@@ -349,6 +349,37 @@ async def get_objectives_context():
         return ""
 
 
+async def get_course_modules_from_pinecone(course_name: str):
+    """
+    Fetch module details for a specific course from Pinecone database.
+    Returns structured module information with topics, duration, and learning outcomes.
+    """
+    if not vectorstore:
+        return None
+    
+    try:
+        # Create a specific query to find module information for the course
+        query = f"modules curriculum topics for {course_name}"
+        
+        # Retrieve relevant documents from Pinecone
+        docs = vectorstore.similarity_search(query, k=5)
+        
+        if not docs:
+            return None
+        
+        # Combine retrieved content
+        module_content = "\n\n".join([doc.page_content for doc in docs])
+        
+        # Cache the result
+        cache_key = f"modules_{course_name.lower().replace(' ', '_')}"
+        cache.set(cache_key, module_content)
+        
+        return module_content
+    except Exception as e:
+        print(f"Error fetching modules for {course_name}: {e}")
+        return None
+
+
 def is_lilit_related_query(question: str) -> bool:
     """
     Check if a query is related to LILIT or education.
@@ -662,6 +693,80 @@ Extract information about "National Certificate in Web Development" course and f
                     yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
+
+            # 4.5 Intercept MODULE/CURRICULUM queries - Fetch from Pinecone
+            if re.search(r"\b(module|modules|curriculum|syllabus|topics|lessons|content|subjects|topics covered)\b", q_lower) or re.search(r"(ඉගෙනුම්|විෂයන්|පරිසර)", q_lower):
+                
+                # Detect which course the user is asking about
+                is_sinhala = bool(re.search(r"[ක-ෆ]", payload.question))
+                
+                # Map course names to query strings
+                courses_to_check = [
+                    ("AI for All", ["ai for all", "certificate ai for all", "e-certificate ai"]),
+                    ("Web Design WordPress", ["web design", "wordpress", "web design wordpress"]),
+                    ("Arduino Robotics", ["arduino", "robotics", "future robotics"]),
+                    ("Web Development", ["web development", "national certificate", "nvq", "web dev"]),
+                    ("AI Content Creation", ["content creation", "ai content", "e-certificate ai content"]),
+                ]
+                
+                course_found = None
+                for course_name, keywords in courses_to_check:
+                    if any(keyword in q_lower for keyword in keywords):
+                        course_found = course_name
+                        break
+                
+                if course_found:
+                    # Try to fetch modules from Pinecone first
+                    modules_from_db = await get_course_modules_from_pinecone(course_found)
+                    
+                    if modules_from_db:
+                        # Use Pinecone data
+                        prompt = f"""The user asked: "{payload.question}"
+
+Course Name: {course_found}
+
+Module Information from Database:
+{modules_from_db}
+
+INSTRUCTIONS:
+1. Extract and list all modules, topics, lessons, and curriculum details clearly
+2. Format each module with: Module Number/Name, Duration, Topics Covered, Learning Outcomes
+3. Respond in the SAME LANGUAGE as the user's question
+4. If the user asked in Sinhala, respond completely in Sinhala
+5. Be comprehensive - include all modules and details found"""
+                        async for chunk in llm.astream(prompt):
+                            yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                        yield "data: [DONE]\n\n"
+                        return
+                    else:
+                        # Pinecone failed/empty - use generic response
+                        if is_sinhala:
+                            msg = f"""දෙවැනි පසුබිමින් ඇති තොරතුරු අනුව, {course_found} පාඨමාලාවේ සවිස්තරාත්මක ඉගෙනුම් සිටුවමක් ගිණුම් බිම වලින් දැනට ලබා ගත නොහැක. 
+                            
+කරුණාකර එහි වෙබ්‍ය පිටුවට https://lms.lilit.lk/all-courses ඉවත් කර ඕනෑම ඉගෙනුම් විස්තරයන් සෙවීමට ගිය කරුණාකර:"""
+                        else:
+                            msg = f"""The detailed module curriculum for the {course_found} course is not currently available in our knowledge base.
+
+Please visit: https://lms.lilit.lk/all-courses
+
+We are continuously updating our course modules. For the most current curriculum and module details, please check the official LILIT LMS website or contact us at:
+- Hotline: +94 70 438 8464
+- Help Line: +94 71 661 6699
+- Email: info@lilit.lk"""
+                        
+                        yield f"data: {json.dumps({'token': msg})}\n\n"
+                        yield "data: [DONE]\n\n"
+                        return
+                else:
+                    # Generic module query without specific course
+                    if is_sinhala:
+                        msg = "කරුණාකර ඔබ කිසින් ඉගෙනුම්වලින් විස්තරයන් ඇසුවිය යුතුය. උදා: 'AI for All ඉගෙනුම් කරුණු?' හෝ 'WordPress පාඨමාලාවේ විෂයන්?'"
+                    else:
+                        msg = "Please specify which course you want to know about. For example: 'What are the modules for AI for All?' or 'Show me the curriculum for WordPress course?'"
+                    
+                    yield f"data: {json.dumps({'token': msg})}\n\n"
+                    yield "data: [DONE]\n\n"
+                    return
 
             # 5. Intercept GENERAL Course Query - Use hardcoded data with language support
             if re.search(
