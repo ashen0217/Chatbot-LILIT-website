@@ -25,6 +25,9 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
+# --- Dynamic Course Fetching Import ---
+import requests
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 load_dotenv()
 
@@ -154,7 +157,7 @@ class CachedData:
         self.cache[key] = (value, time.time())
 
 
-cache = CachedData(ttl_seconds=7200)  # 2 hours cache
+cache = CachedData(ttl_seconds=3600)  # 60 minutes cache for courses and live data
 
 # --- Async Web Scraping Functions with Caching ---
 async def get_live_course_count():
@@ -229,15 +232,79 @@ async def get_course_details_by_id(course_id):
 
 
 async def get_all_course_details():
-    """Return cached course data for all courses (instant response)"""
+    """Fetch live course data dynamically from LMS website with 60-minute cache"""
     cache_key = "all_courses_data"
     cached = cache.get(cache_key)
 
     if cached is not None:
         return cached
 
-    
-    hardcoded_data = """
+    try:
+        # Fetch all courses dynamically from the LMS website
+        async with httpx.AsyncClient(verify=False) as client:
+            response = await client.get("https://lms.lilit.lk/all-courses", timeout=10)
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Find all course links/cards
+            all_links = soup.find_all('a', href=True)
+            course_ids = set()
+
+            for link in all_links:
+                href = link.get('href', '')
+                if '/course-details/' in href:
+                    try:
+                        course_id = href.split('/course-details/')[-1].strip('/')
+                        if course_id.isdigit():
+                            course_ids.add(int(course_id))
+                    except:
+                        pass
+
+            # Fetch details for each course ID
+            formatted_courses = []
+            for course_id in sorted(course_ids):
+                try:
+                    course_response = await client.get(
+                        f"https://lms.lilit.lk/course-details/{course_id}", 
+                        timeout=10
+                    )
+                    course_soup = BeautifulSoup(course_response.text, 'html.parser')
+
+                    # Remove script/style tags
+                    for tag in course_soup(['script', 'style', 'nav', 'header', 'footer']):
+                        tag.decompose()
+
+                    text = course_soup.get_text(separator=' ', strip=True)
+
+                    # Extract structured data
+                    course_name = f"Course ID: {course_id}"
+                    duration = "Not specified"
+                    fee = "Not specified"
+
+                    # Try to find duration pattern
+                    duration_match = re.search(r'(\d+)\s*(days?|weeks?|months?)', text, re.IGNORECASE)
+                    if duration_match:
+                        duration = duration_match.group(0)
+
+                    # Try to find LKR fee
+                    fee_match = re.search(r'(?:LKR|Rs\.?)\s*([\d,]+)', text, re.IGNORECASE)
+                    if fee_match:
+                        fee = f"LKR {fee_match.group(1)}"
+
+                    formatted_courses.append(f"""=== COURSE ID: {course_id} ===
+{course_name}
+DURATION: {duration}
+COURSE FEE: {fee}
+{text[:500]}
+""")
+                except Exception as e:
+                    print(f"Error fetching course {course_id}: {e}")
+                    continue
+
+            if formatted_courses:
+                course_text = "\n".join(formatted_courses)
+            else:
+                # Fallback to hardcoded data if scraping fails
+                course_text = """
 === COURSE ID: 2 ===
 e-Certificate AI for All
 DURATION: 4 Days
@@ -269,8 +336,46 @@ COURSE FEE: LKR 1,000
 Learn to create videos, graphics, and content using the latest AI technology.
 """
 
-    cache.set(cache_key, hardcoded_data)
-    return hardcoded_data
+            # Cache for 60 minutes (3600 seconds)
+            cache.set(cache_key, course_text)
+            return course_text
+
+    except Exception as e:
+        print(f"Error fetching live courses: {e}")
+        # Fallback to hardcoded data
+        fallback_data = """
+=== COURSE ID: 2 ===
+e-Certificate AI for All
+DURATION: 4 Days
+COURSE FEE: LKR 1,000
+This course provides a foundational introduction to AI technology suitable for all learners.
+
+=== COURSE ID: 3 ===
+Web Design WordPress with AI
+DURATION: 2 months
+COURSE FEE: LKR 4,500
+Learn professional web design using WordPress and AI tools. No coding required.
+
+=== COURSE ID: 4 ===
+Arduino With Future Robotics
+DURATION: 3 months
+COURSE FEE: LKR 5,000
+Learn robotics, electronics, and programming with Arduino for hands-on projects.
+
+=== COURSE ID: 5 ===
+National Certificate in Web Development
+DURATION: 6 months
+COURSE FEE: LKR 30,000
+Comprehensive web development program covering HTML, CSS, JavaScript, and modern frameworks.
+
+=== COURSE ID: 7 ===
+AI Content Creation
+DURATION: Flexible
+COURSE FEE: LKR 1,000
+Learn to create videos, graphics, and content using the latest AI technology.
+"""
+        cache.set(cache_key, fallback_data)
+        return fallback_data
 
 
 def get_vision_mission_data():
