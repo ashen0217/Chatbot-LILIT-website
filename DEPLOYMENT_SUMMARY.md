@@ -119,7 +119,7 @@ All 3 test categories passed:
 ```bash
 OPENAI_API_KEY=sk-...
 PINECONE_API_KEY=...
-PINECONE_INDEX_NAME=lilit-lms
+PINECONE_INDEX_NAME=name-lms
 ```
 
 ### What to Do
