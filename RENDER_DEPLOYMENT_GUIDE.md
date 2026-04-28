@@ -21,6 +21,7 @@ Go to your Render service dashboard:
 OPENAI_API_KEY=sk-...your-key...
 PINECONE_API_KEY=your-pinecone-api-key
 PINECONE_INDEX_NAME=lilit-lms
+
 ```
 
 ### Where to Get These Keys
