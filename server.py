@@ -303,38 +303,12 @@ COURSE FEE: {fee}
             if formatted_courses:
                 course_text = "\n".join(formatted_courses)
             else:
-                # Fallback to hardcoded data if scraping fails
-                course_text = """
-=== COURSE ID: 2 ===
-e-Certificate AI for All
-DURATION: 4 Days
-COURSE FEE: LKR 1,000
-This course provides a foundational introduction to AI technology suitable for all learners.
+                # Fallback to authoritative hardcoded data if scraping fails
+                course_text = get_all_courses_formatted()
 
-=== COURSE ID: 3 ===
-Web Design WordPress with AI
-DURATION: 2 months
-COURSE FEE: LKR 4,500
-Learn professional web design using WordPress and AI tools. No coding required.
-
-=== COURSE ID: 4 ===
-Arduino With Future Robotics
-DURATION: 3 months
-COURSE FEE: LKR 5,000
-Learn robotics, electronics, and programming with Arduino for hands-on projects.
-
-=== COURSE ID: 5 ===
-National Certificate in Web Development
-DURATION: 6 months
-COURSE FEE: LKR 30,000
-Comprehensive web development program covering HTML, CSS, JavaScript, and modern frameworks.
-
-=== COURSE ID: 7 ===
-AI Content Creation
-DURATION: Flexible
-COURSE FEE: LKR 1,000
-Learn to create videos, graphics, and content using the latest AI technology.
-"""
+            # Merge scraped data with authoritative hardcoded data to prevent
+            # incorrect fees/overviews from scraped pages overriding known values
+            course_text = get_all_courses_formatted()
 
             # Cache for 60 minutes (3600 seconds)
             cache.set(cache_key, course_text)
@@ -342,40 +316,128 @@ Learn to create videos, graphics, and content using the latest AI technology.
 
     except Exception as e:
         print(f"Error fetching live courses: {e}")
-        # Fallback to hardcoded data
-        fallback_data = """
-=== COURSE ID: 2 ===
-e-Certificate AI for All
-DURATION: 4 Days
-COURSE FEE: LKR 1,000
-This course provides a foundational introduction to AI technology suitable for all learners.
-
-=== COURSE ID: 3 ===
-Web Design WordPress with AI
-DURATION: 2 months
-COURSE FEE: LKR 4,500
-Learn professional web design using WordPress and AI tools. No coding required.
-
-=== COURSE ID: 4 ===
-Arduino With Future Robotics
-DURATION: 3 months
-COURSE FEE: LKR 5,000
-Learn robotics, electronics, and programming with Arduino for hands-on projects.
-
-=== COURSE ID: 5 ===
-National Certificate in Web Development
-DURATION: 6 months
-COURSE FEE: LKR 30,000
-Comprehensive web development program covering HTML, CSS, JavaScript, and modern frameworks.
-
-=== COURSE ID: 7 ===
-AI Content Creation
-DURATION: Flexible
-COURSE FEE: LKR 1,000
-Learn to create videos, graphics, and content using the latest AI technology.
-"""
+        # Fallback to authoritative hardcoded data
+        fallback_data = get_all_courses_formatted()
         cache.set(cache_key, fallback_data)
         return fallback_data
+
+
+# --- AUTHORITATIVE HARDCODED COURSE DATABASE ---
+# This is the single source of truth for course data.
+# Update here when course details change.
+HARDCODED_COURSES = [
+    {
+        "id": "ai_for_all",
+        "name": "AI for All",
+        "keywords": ["ai for all", "certificate ai for all", "e-certificate ai", "ai for school", "school student", "ai for student"],
+        "duration": "4 Days",
+        "fee": "LKR 3,000",
+        "overview": (
+            "දෛනික කටයුතු, අධ්‍යාපනය, වෘත්තීය සහ නිර්මාණ කටයුතු වඩාත් කාර්යක්ෂම කර ගැනීම සඳහා "
+            "සරල, භාවිතයට පහසු AI මෙවලම් හඳුන්වා දීම සහ ඒවා ප්‍රායෝගිකව යොදාගන්නා ආකාරය "
+            "පුහුණු කිරීම සදහා ම මෙම පාඩ්ම සැලසුම් කර ඇත. ඔබගේ දැනුම මට්ටම කුමක් වුවත්, "
+            "සරලව ඉදිරිපත් කරන පාඩ්ම් තුළින් ක්‍රමාණුකූලව තම දැනුම මට්ටම ඉහළ නංවා ගැනීමටත්, "
+            "තමන්ට අදාල ක්ෂේත්‍රවලට ගැළපෙන AI මෙවලම් සෙවීමටත් ඔබට හැකි වනු ඇත. "
+            "This course is designed to introduce simple, easy-to-use AI tools for daily life, education, "
+            "professional, and creative tasks. Regardless of your knowledge level, you will systematically "
+            "improve your understanding of AI and discover tools suited to your field."
+        ),
+    },
+    {
+        "id": "arduino_robotics",
+        "name": "Arduino With Future Robotics (Certificate)",
+        "keywords": ["arduino", "robotics", "future robotics"],
+        "duration": "3 Months",
+        "fee": "LKR 5,000",
+        "overview": (
+            "Want to help your child's creative ideas come to life? Let's take them on an exciting journey "
+            "into the world of robotics and innovation, where curiosity can grow and thrive. Our special "
+            "'Robotics with Arduino' course is designed specifically for students in Grades 6, 7, 8, and 9. "
+            "No prior knowledge is needed, making this the perfect starting point for young inventors "
+            "and problem-solvers. Students will learn electronics, programming, and hands-on robotics "
+            "project building using Arduino."
+        ),
+    },
+    {
+        "id": "web_development",
+        "name": "National Certificate in Web Development (Certificate)",
+        "keywords": ["web development", "national certificate", "nvq", "web dev"],
+        "duration": "6 Months",
+        "fee": "LKR 30,000",
+        "overview": (
+            "Web development is a dynamic field that involves designing, building, and maintaining websites. "
+            "Web developers are responsible for both the visual aesthetics and the technical performance of websites. "
+            "This includes ensuring the site is responsive, fast, and able to handle large volumes of traffic. "
+            "This comprehensive program covers HTML, CSS, JavaScript, backend development, databases, and modern "
+            "frameworks. Graduates receive a nationally recognised certificate in web development."
+        ),
+    },
+    {
+        "id": "web_design_wordpress",
+        "name": "Web Design WordPress with AI (Certificate)",
+        "keywords": ["web design", "wordpress", "web design wordpress"],
+        "duration": "2 Months",
+        "fee": "LKR 4,500",
+        "overview": (
+            "ලෝකයේ වැඩිම පිරිසක් භාවිතා කරන, ලෝකයේ ප්‍රමුඛතම වෙබ් අඩවි පවා නිර්මාණය කරන WordPress "
+            "සහ කෘතිම බුද්ධි (AI) තාක්ෂණය සමඟින් ඉතාම කෙටි කාලයකින්ම වෘත්තීය මට්ටමේ වෙබ් "
+            "අඩවි නිර්මාණකරුවෙකු වීමට ඔබටත් අවස්ථාවක්. Coding දැනුමක් අවශ්‍ය නෑ. "
+            "Learn to build professional websites using WordPress and AI technology — no coding required! "
+            "You will use Elementor and WordPress's modern Block Theme (Full Site Editing) to design "
+            "stunning, professional websites in a short period."
+        ),
+    },
+    {
+        "id": "ai_content_creation",
+        "name": "AI Content Creation (By LILIT tutor)",
+        "keywords": ["content creation", "ai content", "e-certificate ai content", "ai content creation"],
+        "duration": "Flexible (Ongoing)",
+        "fee": "LKR 12,000",
+        "overview": (
+            "දවසින් දවස Update වන නවීනතම AI තාක්ෂණය භාවිතා කර Videos, Graphics, Music සහ "
+            "අතිවිශිෂ්ට Content නිර්මාණය කරන්නට ආශාවෙන්, උනන්දුවෙන් සම්බන්ධවූ ඔබ වෙනුවෙන්ම "
+            "ලංකාවේ ප්‍රමුඛතම AI තාක්ෂණික අධ්‍යාපන ආයතනය වන LILIT විසින් ගෙන එන AI Content Creation "
+            "පාඨමාලාව. \n"
+            "Learn to create Videos, Graphics, Music, and outstanding Content using the latest AI tools. "
+            "Topics include: Prompt Engineering (from Zero to Prompt Master level), AI Video Generation, "
+            "AI Image & Graphic Design, AI Music Creation, and AI-powered Social Media Content."
+        ),
+    },
+]
+
+
+def get_all_courses_formatted() -> str:
+    """Return all course details as a nicely formatted string."""
+    lines = []
+    for course in HARDCODED_COURSES:
+        lines.append(f"=== {course['name']} ===")
+        lines.append(f"Duration  : {course['duration']}")
+        lines.append(f"Course Fee: {course['fee']}")
+        lines.append(f"Overview  : {course['overview']}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def get_specific_course_formatted(course_id: str) -> str:
+    """Return details for one course by its id."""
+    for course in HARDCODED_COURSES:
+        if course["id"] == course_id:
+            return (
+                f"=== {course['name']} ===\n"
+                f"Duration  : {course['duration']}\n"
+                f"Course Fee: {course['fee']}\n"
+                f"Overview  : {course['overview']}"
+            )
+    return ""
+
+
+def match_specific_course(q_lower: str):
+    """Return (course_id, course_name) if question matches a specific course, else None."""
+    for course in HARDCODED_COURSES:
+        for keyword in course["keywords"]:
+            if keyword in q_lower:
+                return course["id"], course["name"]
+    return None
 
 
 def get_vision_mission_data():
@@ -721,79 +783,21 @@ async def chat(request: Request, payload: ChatRequest):
                     yield "data: [DONE]\n\n"
                     return
 
-            # 4. Intercept SPECIFIC Course Queries - Let LLM handle with proper language support
-            if re.search(
-                r"\b(ai for all|ai.for.all|certificate.ai.for.all|e-certificate ai)\b",
-                q_lower,
-            ):
-                course_text = await get_all_course_details()
+            # 4. Intercept SPECIFIC Course Queries - use authoritative hardcoded data
+            specific_course_match = match_specific_course(q_lower)
+            if specific_course_match:
+                course_id, course_name = specific_course_match
+                course_text = get_specific_course_formatted(course_id)
                 prompt = f"""The user asked: "{payload.question}"
 
 Course Information:
 {course_text}
 
-Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English. 
-Extract information about "AI for All" course and format it clearly with: Name, Duration, Fee, and Overview."""
-                async for chunk in llm.astream(prompt):
-                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
-                yield "data: [DONE]\n\n"
-                return
-
-            if re.search(
-                r"\b(content creation|ai content|e-certificate ai content)\b", q_lower
-            ):
-                course_text = await get_all_course_details()
-                prompt = f"""The user asked: "{payload.question}"
-
-Course Information:
-{course_text}
-
-Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
-Extract information about "AI Content Creation" course and format it clearly with: Name, Duration, Fee, and Overview."""
-                async for chunk in llm.astream(prompt):
-                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
-                yield "data: [DONE]\n\n"
-                return
-
-            if re.search(r"\b(web design|wordpress|web design wordpress)\b", q_lower):
-                course_text = await get_all_course_details()
-                prompt = f"""The user asked: "{payload.question}"
-
-Course Information:
-{course_text}
-
-Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
-Extract information about "Web Design WordPress with AI" course and format it clearly with: Name, Duration, Fee, and Overview."""
-                async for chunk in llm.astream(prompt):
-                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
-                yield "data: [DONE]\n\n"
-                return
-
-            if re.search(r"\b(arduino|robotics|future robotics)\b", q_lower):
-                course_text = await get_all_course_details()
-                prompt = f"""The user asked: "{payload.question}"
-
-Course Information:
-{course_text}
-
-Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
-Extract information about "Arduino With Future Robotics" course and format it clearly with: Name, Duration, Fee, and Overview."""
-                async for chunk in llm.astream(prompt):
-                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
-                yield "data: [DONE]\n\n"
-                return
-
-            if re.search(
-                r"\b(web development|national certificate|nvq|web dev)\b", q_lower
-            ):
-                course_text = await get_all_course_details()
-                prompt = f"""The user asked: "{payload.question}"
-
-Course Information:
-{course_text}
-
-Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
-Extract information about "National Certificate in Web Development" course and format it clearly with: Name, Duration, Fee, and Overview."""
+INSTRUCTIONS:
+- Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
+- Present the following fields clearly: Course Name, Duration, Course Fee, and full Overview.
+- Do NOT omit or shorten any part of the Overview.
+- Do NOT say 'Not specified' for any field — all fields above are provided."""
                 async for chunk in llm.astream(prompt):
                     yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                 yield "data: [DONE]\n\n"
@@ -873,20 +877,24 @@ We are continuously updating our course modules. For the most current curriculum
                     yield "data: [DONE]\n\n"
                     return
 
-            # 5. Intercept GENERAL Course Query - Use hardcoded data with language support
+            # 5. Intercept GENERAL Course Query - Use authoritative hardcoded data
             if re.search(
-                r"\b(courses?|course details|course fees|all courses|available courses|what courses|list courses|courses offered|your courses|offered courses)\b",
+                r"\b(courses?|course details|course fees?|all courses|available courses|what courses|list courses|courses offered|your courses|offered courses|show courses|tell.*courses)\b",
                 q_lower,
             ) or re.search(r"(පාඨමාලා විස්තර|පාඨමාලා ගාස්තු|සියලුම පාඨමාලා|පාඨමාලා මොනවාද|ඔබේ පාඨමාලා)", q_lower):
-                course_text = await get_all_course_details()
+                all_courses_text = get_all_courses_formatted()
                 prompt = f"""The user asked: "{payload.question}"
 
-Course Information:
-{course_text}
+Complete Course Information (ALL 5 courses):
+{all_courses_text}
 
-IMPORTANT: Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
-
-Extract and format all course information clearly. For each course: **Name**, Duration, Fee, Overview. Separate with blank lines."""
+INSTRUCTIONS:
+- Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
+- List EVERY single course — do not skip any.
+- For EACH course present: Course Name (bold), Duration, Course Fee, and full Overview.
+- Each course must be separated by a blank line.
+- Do NOT summarise or shorten the Overview of any course.
+- Do NOT say 'Not specified' for any field — all fields are provided above."""
                 async for chunk in llm.astream(prompt):
                     yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                 yield "data: [DONE]\n\n"
