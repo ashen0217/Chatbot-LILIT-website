@@ -418,6 +418,14 @@ def get_all_courses_formatted() -> str:
     return "\n".join(lines)
 
 
+def get_all_course_names_formatted() -> str:
+    """Return only the list of course names as a formatted string."""
+    lines = []
+    for i, course in enumerate(HARDCODED_COURSES, 1):
+        lines.append(f"{i}. {course['name']}")
+    return "\n".join(lines)
+
+
 def get_specific_course_formatted(course_id: str) -> str:
     """Return details for one course by its id."""
     for course in HARDCODED_COURSES:
@@ -877,11 +885,34 @@ We are continuously updating our course modules. For the most current curriculum
                     yield "data: [DONE]\n\n"
                     return
 
-            # 5. Intercept GENERAL Course Query - Use authoritative hardcoded data
-            if re.search(
-                r"\b(courses?|course details|course fees?|all courses|available courses|what courses|list courses|courses offered|your courses|offered courses|show courses|tell.*courses)\b",
+            # 5a. Intercept COURSE NAMES ONLY query
+            # Triggered when user asks for a list/names of courses WITHOUT asking for details/fees/overview
+            _course_names_pattern = re.search(
+                r"\b(what courses|which courses|list.*courses?|course names?|available courses|courses (do you|you) offer|courses offered|show.*courses?|all courses)\b",
                 q_lower,
-            ) or re.search(r"(පාඨමාලා විස්තර|පාඨමාලා ගාස්තු|සියලුම පාඨමාලා|පාඨමාලා මොනවාද|ඔබේ පාඨමාලා)", q_lower):
+            ) or re.search(r"(පාඨමාලා මොනවාද|ඔබේ පාඨමාලා|පාඨමාලා නාම|සියලුම පාඨමාලා)", q_lower)
+
+            _course_details_pattern = re.search(
+                r"\b(course details?|course fees?|tell.*about.*courses?|explain.*courses?|describe.*courses?|courses? (fee|price|cost|duration|overview))\b",
+                q_lower,
+            ) or re.search(r"(පාඨමාලා විස්තර|පාඨමාලා ගාස්තු)", q_lower)
+
+            if _course_names_pattern and not _course_details_pattern:
+                # Return only course names
+                course_names_text = get_all_course_names_formatted()
+                is_sinhala = bool(re.search(r"[ක-ෆ]", payload.question))
+                if is_sinhala:
+                    answer = f"LILIT ආයතනයේ ඇති පාඨමාලා:\n\n{course_names_text}\n\nඕනෑම පාඨමාලාවක් ගැන වැඩිදුර විස්තර ලබා ගැනීමට, එහි නම සඳහන් කරන්න."
+                else:
+                    answer = f"Here are the courses offered by LILIT:\n\n{course_names_text}\n\nAsk me about any specific course for full details."
+                yield f"data: {json.dumps({'token': answer})}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
+            # 5b. Intercept GENERAL Course DETAILS query - Use authoritative hardcoded data
+            if _course_details_pattern or re.search(
+                r"\b(courses? details?|all course details?|full course info)\b", q_lower
+            ) or re.search(r"(පාඨමාලා විස්තර|පාඨමාලා ගාස්තු)", q_lower):
                 all_courses_text = get_all_courses_formatted()
                 prompt = f"""The user asked: "{payload.question}"
 
