@@ -22,7 +22,7 @@
 # LOCAL TEST (while server is running on localhost):
 
 $body = '{"course_id":"TEST-101","title":"Test Auto-Sync Course","description":"Checking if the webhook successfully connects to Pinecone.","duration":"1 Week","fee":"Free","url":"https://lms.lilit.lk/course-details/101"}'
-Invoke-WebRequest -Uri "http://localhost:8000/api/sync-course" -Method POST -Headers @{"Content-Type"="application/json"; "X-Sync-Token"="LILIT_LMS_Sync_8f92a4b6c3d1e7"} -Body $body
+Invoke-WebRequest -Uri "http://localhost:8000/api/sync-course" -Method POST -Headers @{"Content-Type"="application/json"; ""} -Body $body
 
 # PRODUCTION TEST (replace YOUR-RENDER-URL with your real Render subdomain):
 
