@@ -7,10 +7,11 @@ from functools import lru_cache
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException, Depends, Security
 from pydantic import BaseModel
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import APIKeyHeader
 import httpx
 import json
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -24,6 +25,7 @@ from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain_core.documents import Document
 
 # --- Dynamic Course Fetching Import ---
 import requests
@@ -137,6 +139,35 @@ else:
 
 class ChatRequest(BaseModel):
     question: str
+
+
+# ---------------------------------------------------------------------------
+# [ADD] Pinecone Auto-Sync Webhook — Security & Data Models
+# ---------------------------------------------------------------------------
+
+class CourseSyncPayload(BaseModel):
+    """Payload schema for the /api/sync-course webhook."""
+    course_id: str
+    title: str
+    description: str
+    duration: str
+    fee: str
+    url: str
+
+
+# Header-based token authentication
+_sync_token_header = APIKeyHeader(name="X-Sync-Token", auto_error=False)
+
+
+async def verify_sync_token(token: str = Security(_sync_token_header)) -> str:
+    """Dependency: validate the X-Sync-Token header against SYNC_SECRET_TOKEN env var."""
+    expected = os.getenv("SYNC_SECRET_TOKEN", "")
+    if not token or token != expected:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: invalid or missing X-Sync-Token header.",
+        )
+    return token
 
 
 # --- Cache Layer for Live Data ---
@@ -959,3 +990,56 @@ INSTRUCTIONS:
             yield "data: [DONE]\n\n"
 
     return StreamingResponse(generate_stream(), media_type="text/event-stream")
+
+
+# ---------------------------------------------------------------------------
+# [ADD] /api/sync-course  — Pinecone Auto-Sync Webhook
+# ---------------------------------------------------------------------------
+
+@app.post("/api/sync-course")
+async def sync_course(
+    payload: CourseSyncPayload,
+    _token: str = Depends(verify_sync_token),
+):
+    """
+    Webhook endpoint for the LMS website.
+    Accepts structured course data and upserts it into the Pinecone vector store.
+    Protected by the X-Sync-Token header.
+    """
+    if not vectorstore:
+        raise HTTPException(
+            status_code=503,
+            detail="Vector store is unavailable. Cannot sync course data.",
+        )
+
+    # Format the payload into a rich plain-text document for embedding
+    formatted_content = (
+        f"Course Title: {payload.title}\n"
+        f"Description: {payload.description}\n"
+        f"Duration: {payload.duration}\n"
+        f"Course Fee: {payload.fee}\n"
+        f"URL: {payload.url}"
+    )
+
+    new_doc = Document(
+        page_content=formatted_content,
+        metadata={
+            "source": payload.url,
+            "course_id": payload.course_id,
+        },
+    )
+
+    try:
+        vectorstore.add_documents([new_doc])
+        print(f"✓ Synced course to Pinecone: '{payload.title}' (id={payload.course_id})")
+        return {
+            "status": "success",
+            "message": f"Course '{payload.title}' has been successfully synced to the knowledge base.",
+            "course_id": payload.course_id,
+        }
+    except Exception as exc:
+        print(f"✗ Pinecone sync error for course '{payload.title}': {exc}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to insert course into vector store: {exc}",
+        )
