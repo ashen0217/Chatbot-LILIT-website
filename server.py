@@ -353,206 +353,109 @@ COURSE FEE: {fee}
         return fallback_data
 
 
-# --- AUTHORITATIVE HARDCODED COURSE DATABASE ---
-# This is the single source of truth for course data.
-# Update here when course details change.
-HARDCODED_COURSES = [
-    {
-        "id": "ai_for_all",
-        "name": "AI for All",
-        "keywords": ["ai for all", "certificate ai for all", "e-certificate ai", "ai for school", "school student", "ai for student"],
-        "duration": "4 Days",
-        "fee": "LKR 3,000",
-        "overview": (
-            "දෛනික කටයුතු, අධ්‍යාපනය, වෘත්තීය සහ නිර්මාණ කටයුතු වඩාත් කාර්යක්ෂම කර ගැනීම සඳහා "
-            "සරල, භාවිතයට පහසු AI මෙවලම් හඳුන්වා දීම සහ ඒවා ප්‍රායෝගිකව යොදාගන්නා ආකාරය "
-            "පුහුණු කිරීම සදහා ම මෙම පාඩ්ම සැලසුම් කර ඇත. ඔබගේ දැනුම මට්ටම කුමක් වුවත්, "
-            "සරලව ඉදිරිපත් කරන පාඩ්ම් තුළින් ක්‍රමාණුකූලව තම දැනුම මට්ටම ඉහළ නංවා ගැනීමටත්, "
-            "තමන්ට අදාල ක්ෂේත්‍රවලට ගැළපෙන AI මෙවලම් සෙවීමටත් ඔබට හැකි වනු ඇත. "
-            "This course is designed to introduce simple, easy-to-use AI tools for daily life, education, "
-            "professional, and creative tasks. Regardless of your knowledge level, you will systematically "
-            "improve your understanding of AI and discover tools suited to your field."
-        ),
-    },
-    {
-        "id": "arduino_robotics",
-        "name": "Arduino With Future Robotics (Certificate)",
-        "keywords": ["arduino", "robotics", "future robotics"],
-        "duration": "3 Months",
-        "fee": "LKR 5,000",
-        "overview": (
-            "Want to help your child's creative ideas come to life? Let's take them on an exciting journey "
-            "into the world of robotics and innovation, where curiosity can grow and thrive. Our special "
-            "'Robotics with Arduino' course is designed specifically for students in Grades 6, 7, 8, and 9. "
-            "No prior knowledge is needed, making this the perfect starting point for young inventors "
-            "and problem-solvers. Students will learn electronics, programming, and hands-on robotics "
-            "project building using Arduino."
-        ),
-    },
-    {
-        "id": "web_development",
-        "name": "National Certificate in Web Development (Certificate)",
-        "keywords": ["web development", "national certificate", "nvq", "web dev"],
-        "duration": "6 Months",
-        "fee": "LKR 30,000",
-        "overview": (
-            "Web development is a dynamic field that involves designing, building, and maintaining websites. "
-            "Web developers are responsible for both the visual aesthetics and the technical performance of websites. "
-            "This includes ensuring the site is responsive, fast, and able to handle large volumes of traffic. "
-            "This comprehensive program covers HTML, CSS, JavaScript, backend development, databases, and modern "
-            "frameworks. Graduates receive a nationally recognised certificate in web development."
-        ),
-    },
-    {
-        "id": "web_design_wordpress",
-        "name": "Web Design WordPress with AI (Certificate)",
-        "keywords": ["web design", "wordpress", "web design wordpress"],
-        "duration": "2 Months",
-        "fee": "LKR 4,500",
-        "overview": (
-            "ලෝකයේ වැඩිම පිරිසක් භාවිතා කරන, ලෝකයේ ප්‍රමුඛතම වෙබ් අඩවි පවා නිර්මාණය කරන WordPress "
-            "සහ කෘතිම බුද්ධි (AI) තාක්ෂණය සමඟින් ඉතාම කෙටි කාලයකින්ම වෘත්තීය මට්ටමේ වෙබ් "
-            "අඩවි නිර්මාණකරුවෙකු වීමට ඔබටත් අවස්ථාවක්. Coding දැනුමක් අවශ්‍ය නෑ. "
-            "Learn to build professional websites using WordPress and AI technology — no coding required! "
-            "You will use Elementor and WordPress's modern Block Theme (Full Site Editing) to design "
-            "stunning, professional websites in a short period."
-        ),
-    },
-    {
-        "id": "ai_content_creation",
-        "name": "AI Content Creation (By LILIT tutor)",
-        "keywords": ["content creation", "ai content", "e-certificate ai content", "ai content creation"],
-        "duration": "Flexible (Ongoing)",
-        "fee": "LKR 12,000",
-        "overview": (
-            "දවසින් දවස Update වන නවීනතම AI තාක්ෂණය භාවිතා කර Videos, Graphics, Music සහ "
-            "අතිවිශිෂ්ට Content නිර්මාණය කරන්නට ආශාවෙන්, උනන්දුවෙන් සම්බන්ධවූ ඔබ වෙනුවෙන්ම "
-            "ලංකාවේ ප්‍රමුඛතම AI තාක්ෂණික අධ්‍යාපන ආයතනය වන LILIT විසින් ගෙන එන AI Content Creation "
-            "පාඨමාලාව. \n"
-            "Learn to create Videos, Graphics, Music, and outstanding Content using the latest AI tools. "
-            "Topics include: Prompt Engineering (from Zero to Prompt Master level), AI Video Generation, "
-            "AI Image & Graphic Design, AI Music Creation, and AI-powered Social Media Content."
-        ),
-    },
+# ---------------------------------------------------------------------------
+# Pinecone-backed helpers — all data sourced from Pinecone, cached 60 min
+# ---------------------------------------------------------------------------
+
+async def _pinecone_search(query: str, k: int = 6) -> str:
+    """Run a similarity search against Pinecone and return joined page content."""
+    if not vectorstore:
+        return ""
+    try:
+        docs = vectorstore.similarity_search(query, k=k)
+        return "\n\n".join(doc.page_content for doc in docs)
+    except Exception as e:
+        print(f"Pinecone search error for '{query}': {e}")
+        return ""
+
+
+async def get_courses_context_from_pinecone() -> str:
+    """Fetch all course details (name, duration, fee, overview) from Pinecone."""
+    cache_key = "pinecone_all_courses"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    result = await _pinecone_search(
+        "LILIT courses list name duration fee overview description", k=8
+    )
+    if result:
+        cache.set(cache_key, result)
+    return result
+
+
+async def get_specific_course_from_pinecone(course_name: str) -> str:
+    """Fetch details for a single named course from Pinecone."""
+    cache_key = f"pinecone_course_{course_name.lower().replace(' ', '_')}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    result = await _pinecone_search(
+        f"{course_name} course duration fee overview description", k=6
+    )
+    if result:
+        cache.set(cache_key, result)
+    return result
+
+
+async def get_vision_mission_from_pinecone() -> str:
+    """Fetch vision and mission statements from Pinecone."""
+    cache_key = "pinecone_vision_mission"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    result = await _pinecone_search(
+        "LILIT vision mission statement goals purpose", k=5
+    )
+    if result:
+        cache.set(cache_key, result)
+    return result
+
+
+async def get_objectives_from_pinecone() -> str:
+    """Fetch objectives/aims/goals from Pinecone."""
+    cache_key = "pinecone_objectives"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    result = await _pinecone_search(
+        "LILIT objectives aims goals educational purpose", k=5
+    )
+    if result:
+        cache.set(cache_key, result)
+    return result
+
+
+async def get_about_from_pinecone() -> str:
+    """Fetch About LILIT information from Pinecone."""
+    cache_key = "pinecone_about"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    result = await _pinecone_search(
+        "about LILIT LMS institution vision mission objectives contact", k=8
+    )
+    if result:
+        cache.set(cache_key, result)
+    return result
+
+
+# Keyword map for matching a specific course mentioned in a question
+_COURSE_KEYWORDS = [
+    ("AI for All", ["ai for all", "certificate ai for all", "e-certificate ai", "ai for school", "ai for student"]),
+    ("Arduino With Future Robotics", ["arduino", "robotics", "future robotics"]),
+    ("National Certificate in Web Development", ["web development", "national certificate", "nvq", "web dev"]),
+    ("Web Design WordPress with AI", ["web design", "wordpress", "web design wordpress"]),
+    ("AI Content Creation", ["content creation", "ai content", "e-certificate ai content", "ai content creation"]),
 ]
 
 
-def get_all_courses_formatted() -> str:
-    """Return all course details as a nicely formatted string."""
-    lines = []
-    for course in HARDCODED_COURSES:
-        lines.append(f"=== {course['name']} ===")
-        lines.append(f"Duration  : {course['duration']}")
-        lines.append(f"Course Fee: {course['fee']}")
-        lines.append(f"Overview  : {course['overview']}")
-        lines.append("")
-    return "\n".join(lines)
-
-
-def get_all_course_names_formatted() -> str:
-    """Return only the list of course names as a formatted string."""
-    lines = []
-    for i, course in enumerate(HARDCODED_COURSES, 1):
-        lines.append(f"{i}. {course['name']}")
-    return "\n".join(lines)
-
-
-def get_specific_course_formatted(course_id: str) -> str:
-    """Return details for one course by its id."""
-    for course in HARDCODED_COURSES:
-        if course["id"] == course_id:
-            return (
-                f"=== {course['name']} ===\n"
-                f"Duration  : {course['duration']}\n"
-                f"Course Fee: {course['fee']}\n"
-                f"Overview  : {course['overview']}"
-            )
-    return ""
-
-
-def match_specific_course(q_lower: str):
-    """Return (course_id, course_name) if question matches a specific course, else None."""
-    for course in HARDCODED_COURSES:
-        for keyword in course["keywords"]:
-            if keyword in q_lower:
-                return course["id"], course["name"]
+def match_specific_course_name(q_lower: str):
+    """Return the course name string if the question targets a specific course, else None."""
+    for course_name, keywords in _COURSE_KEYWORDS:
+        for kw in keywords:
+            if kw in q_lower:
+                return course_name
     return None
-
-
-def get_vision_mission_data():
-    """Return hardcoded vision/mission statements for 100% accuracy"""
-    return {
-        "vision_sinhala": "දැනුම, කුසලතා, අගයයන් සහ හැසිරීම් වලින් පරිපූර්ණ පුරවැසියන් බිහි කරන ප්‍රමුඛ අධ්‍යාපන ආයතනයක් බවට පත්වීමත්, නිතරම පරිවර්තනය වන ලෝකය සමග යාවත්කාලීනව සිටීමත් සඳහා.",
-        "vision_english": "To become a leading educational institution that nurtures citizens enriched with knowledge, skills, values, and attitudes, while staying updated with the ever-evolving world.",
-        "mission_english": "To revolutionize education through innovative technology solutions that empower institutions, educators, and students to achieve their full potential.",
-        "mission_sinhala": "අපේ මෙහෙවර වන්නේ නවීන තාක්ෂණ විසඳුම් ඔස්සේ අධ්‍යාපනය ප්‍රතිවිප්ලවීය කිරීමයි, එමඟින් ආයතන, අධ්‍යාපකයින් සහ සිසුන් තම සම්පූර්ණ හැකියාවන් දක්වමින් සාර්ථක වීමට හැකි වීමයි.",
-    }
-
-
-def get_objectives_data():
-    """Return hardcoded objectives data for 100% accuracy"""
-    return {
-        "objectives_english": """**Excellence in Education**
-To create an excellent educational environment enriched with knowledge, skills, values, and attitudes, fostering well-rounded citizens.
-
-**Technological Innovation**
-To integrate cutting-edge technology and innovative teaching methods that keep pace with the rapidly evolving digital world.
-
-**Student Empowerment**
-To empower students with practical skills and theoretical knowledge that prepare them for successful careers in their chosen fields.
-
-**Accessibility and Affordability**
-To provide high-quality education at affordable rates, making learning accessible to students from all backgrounds.
-
-**Industry-Relevant Training**
-To offer courses aligned with current industry demands, ensuring graduates are job-ready and competitive in the market.
-
-**Continuous Learning**
-To promote lifelong learning and professional development through flexible course structures and up-to-date curriculum.
-
-**Community Development**
-To contribute to the development of the local and national community by producing skilled, ethical, and responsible graduates.""",
-        "objectives_sinhala": """**අධ්‍යාපනයේ උසස් බව**
-දැනුම, කුසලතා, වටිනාකම් සහ ආකල්ප වලින් පොහොසත් වූ විශිෂ්ට අධ්‍යාපන පරිසරයක් නිර්මාණය කිරීම.
-
-**තාක්ෂණික නවෝත්පාදන**
-වේගයෙන් වර්ධනය වන ඩිජිටල් ලෝකය සමඟ පා එකට තබමින් අති නවීන තාක්ෂණය සහ නව්‍ය ඉගැන්වීම් ක්‍රම ඒකාබද්ධ කිරීම.
-
-**ශිෂ්‍ය සවිබල ගැන්වීම**
-තෝරාගත් ක්ෂේත්‍රවල සාර්ථක වෘත්තීන් සඳහා සූදානම් කරන ප්‍රායෝගික කුසලතා සහ න්‍යායාත්මක දැනුම සමඟ සිසුන් සවිබල ගැන්වීම.
-
-**ප්‍රවේශය සහ දැරිය හැකි මිල**
-සෑම පසුබිමකින්ම සිසුන්ට ඉගෙනීම ප්‍රවේශ විය හැකි ලෙස දැරිය හැකි මිලකට උසස් තත්ත්වයේ අධ්‍යාපනය ලබා දීම.
-
-**කර්මාන්තයට අදාළ පුහුණුව**
-වර්තමාන කර්මාන්ත ඉල්ලුම් වලට අනුකූලව පාඨමාලා ඉදිරිපත් කිරීම, උපාධිධාරීන් රැකියා සඳහා සූදානම් වන බව සහතික කිරීම.
-
-**අඛණ්ඩ ඉගෙනීම**
-නම්‍යශීලී පාඨමාලා ව්‍යූහ සහ යාවත්කාලීන විෂය මාලාව හරහා ජීවිත කාලය පුරාවටම ඉගෙනීම සහ වෘත්තීය සංවර්ධනය ප්‍රවර්ධනය කිරීම.
-
-**ප්‍රජා සංවර්ධනය**
-දක්ෂ, ආචාර ධාර්මික සහ වගකිවයුතු උපාධිධාරීන් නිෂ්පාදනය කිරීමෙන් දේශීය සහ ජාතික ප්‍රජාවේ සංවර්ධනයට දායක වීම.""",
-    }
-
-
-async def get_objectives_context():
-    """Fetch objectives from About page with caching"""
-    cached = cache.get("objectives")
-    if cached is not None:
-        return cached
-
-    try:
-        async with httpx.AsyncClient(verify=False) as client:
-            response = await client.get("https://lms.lilit.lk/about", timeout=10)
-            soup = BeautifulSoup(response.text, "html.parser")
-            for tag in soup(["nav", "header", "footer", "aside", "script", "style"]):
-                tag.decompose()
-            content = soup.get_text(separator="\n", strip=True)
-            cache.set("objectives", content)
-            return content
-    except Exception as e:
-        print(f"Error fetching objectives: {e}")
-        return ""
 
 
 async def get_course_modules_from_pinecone(course_name: str):
@@ -715,95 +618,71 @@ async def chat(request: Request, payload: ChatRequest):
                 yield "data: [DONE]\n\n"
                 return
 
-            # 2. Intercept Objectives query with hardcoded data for accuracy
+            # 2. Intercept Objectives query — fetch from Pinecone
             if re.search(
                 r"\b(objective|objectives|aim|aims|goal|goals|අරමුණු)\b", q_lower
             ):
-                objectives_data = get_objectives_data()
-
-                # Detect language
                 is_sinhala = bool(re.search(r"[ක-ෆ]", payload.question))
-
-                # Return exact hardcoded objectives
-                if is_sinhala:
-                    answer = objectives_data["objectives_sinhala"]
+                context = await get_objectives_from_pinecone()
+                if context:
+                    prompt = (
+                        f'The user asked: "{payload.question}"\n\n'
+                        f"Context from database:\n{context}\n\n"
+                        "INSTRUCTIONS:\n"
+                        "- List ALL objectives found in the context with their full descriptions.\n"
+                        "- Respond in the SAME LANGUAGE as the user's question.\n"
+                        "- Do NOT shorten or summarise any objective."
+                    )
+                    async for chunk in llm.astream(prompt):
+                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                 else:
-                    answer = objectives_data["objectives_english"]
-
-                # Stream the hardcoded answer
-                yield f"data: {json.dumps({'token': answer})}\n\n"
+                    msg = ("සමාවන්න, අරමුණු තොරතුරු දැනට ලබා ගත නොහැක." if is_sinhala
+                           else "I'm sorry, objectives information is not currently available.")
+                    yield f"data: {json.dumps({'token': msg})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
 
-            # 2.1 Intercept "About" queries with comprehensive information
+            # 2.1 Intercept "About" queries — fetch from Pinecone
             if re.search(r"\b(about|about us|about lilit|ලිලිට් ගැන|අප ගැන)\b", q_lower):
-                # Detect language
                 is_sinhala = bool(re.search(r"[ක-ෆ]", payload.question))
-
-                # Get all About data
-                vm_data = get_vision_mission_data()
-                obj_data = get_objectives_data()
-
-                if is_sinhala:
-                    about_info = f"""**ලිලිට් LMS ගැන**
-
-**දැක්ම:**
-{vm_data["vision_sinhala"]}
-
-**අරමුණු:**
-{obj_data["objectives_sinhala"]}
-
-**සම්බන්ධ විය හැකි විස්තර:**
-- Hotline: +94 70 438 8464
-- Help Line: +94 71 661 6699
-- Email: info@lilit.lk
-- Address: D/263/2, Magammana, Dehiowita."""
+                context = await get_about_from_pinecone()
+                if context:
+                    prompt = (
+                        f'The user asked: "{payload.question}"\n\n'
+                        f"Context from database:\n{context}\n\n"
+                        "INSTRUCTIONS:\n"
+                        "- Provide comprehensive information about LILIT: vision, mission, objectives, and contact details.\n"
+                        "- Respond in the SAME LANGUAGE as the user's question.\n"
+                        "- Include all contact details found in the context."
+                    )
+                    async for chunk in llm.astream(prompt):
+                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                 else:
-                    about_info = f"""**About LILIT LMS**
-
-**Vision:**
-{vm_data["vision_english"]}
-
-**Mission:**
-{vm_data["mission_english"]}
-
-**Objectives:**
-{obj_data["objectives_english"]}
-
-**Contact Information:**
-- Hotline: +94 70 438 8464
-- Help Line: +94 71 661 6699
-- Email: info@lilit.lk
-- Address: D/263/2, Magammana, Dehiowita."""
-
-                yield f"data: {json.dumps({'token': about_info})}\n\n"
+                    msg = ("සමාවන්න, LILIT ගැන තොරතුරු දැනට ලබා ගත නොහැක." if is_sinhala
+                           else "I'm sorry, information about LILIT is not currently available.")
+                    yield f"data: {json.dumps({'token': msg})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
 
-            # 2.5 Intercept Vision/Mission queries with 100% accuracy
+            # 2.5 Intercept Vision/Mission queries — fetch from Pinecone
             if re.search(r"\b(vision|mission|දැක්ම|ප්‍රතිපත්තිය|මෙහෙවර)\b", q_lower):
-                # Get hardcoded data for 100% accuracy
-                vm_data = get_vision_mission_data()
-
-                # Determine what user is asking for
-                is_vision = bool(re.search(r"\b(vision|දැක්ම)\b", q_lower))
-                is_sinhala = bool(
-                    re.search(r"[ක-ෆ]", payload.question)
-                )  # Detect Sinhala characters
-
-                # Return exact hardcoded answer
-                if is_vision and is_sinhala:
-                    answer = vm_data["vision_sinhala"]
-                elif is_vision and not is_sinhala:
-                    answer = vm_data["vision_english"]
-                elif not is_vision and not is_sinhala:
-                    answer = vm_data["mission_english"]
+                is_sinhala = bool(re.search(r"[ක-ෆ]", payload.question))
+                context = await get_vision_mission_from_pinecone()
+                if context:
+                    prompt = (
+                        f'The user asked: "{payload.question}"\n\n'
+                        f"Context from database:\n{context}\n\n"
+                        "INSTRUCTIONS:\n"
+                        "- Extract and present the FULL vision and/or mission statement(s) from the context.\n"
+                        "- Do NOT summarise — return the complete text.\n"
+                        "- Respond in the SAME LANGUAGE as the user's question."
+                    )
+                    async for chunk in llm.astream(prompt):
+                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                 else:
-                    # Mission in Sinhala - use hardcoded data
-                    answer = vm_data["mission_sinhala"]
-
-                # Stream the hardcoded answer
-                yield f"data: {json.dumps({'token': answer})}\n\n"
+                    msg = ("සමාවන්න, දැක්ම/මෙහෙවර තොරතුරු දැනට ලබා ගත නොහැක." if is_sinhala
+                           else "I'm sorry, vision/mission information is not currently available.")
+                    yield f"data: {json.dumps({'token': msg})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
 
@@ -822,99 +701,66 @@ async def chat(request: Request, payload: ChatRequest):
                     yield "data: [DONE]\n\n"
                     return
 
-            # 4. Intercept SPECIFIC Course Queries - use authoritative hardcoded data
-            specific_course_match = match_specific_course(q_lower)
-            if specific_course_match:
-                course_id, course_name = specific_course_match
-                course_text = get_specific_course_formatted(course_id)
-                prompt = f"""The user asked: "{payload.question}"
-
-Course Information:
-{course_text}
-
-INSTRUCTIONS:
-- Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
-- Present the following fields clearly: Course Name, Duration, Course Fee, and full Overview.
-- Do NOT omit or shorten any part of the Overview.
-- Do NOT say 'Not specified' for any field — all fields above are provided."""
-                async for chunk in llm.astream(prompt):
-                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+            # 4. Intercept SPECIFIC Course Queries — fetch from Pinecone
+            matched_course_name = match_specific_course_name(q_lower)
+            if matched_course_name:
+                course_text = await get_specific_course_from_pinecone(matched_course_name)
+                if course_text:
+                    prompt = (
+                        f'The user asked: "{payload.question}"\n\n'
+                        f"Course Information from database:\n{course_text}\n\n"
+                        "INSTRUCTIONS:\n"
+                        "- Respond in the SAME LANGUAGE as the user's question.\n"
+                        "- Present clearly: Course Name, Duration, Course Fee, and full Overview.\n"
+                        "- Do NOT omit or shorten any part of the Overview.\n"
+                        "- If a fee or duration is mentioned anywhere in the context, include it."
+                    )
+                    async for chunk in llm.astream(prompt):
+                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                else:
+                    # Fall back to the standard qa_chain if Pinecone returns nothing
+                    if qa_chain:
+                        async for chunk in qa_chain.astream(payload.question):
+                            yield f"data: {json.dumps({'token': chunk})}\n\n"
+                    else:
+                        yield f"data: {json.dumps({'token': 'Course information not available at the moment.'})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
 
-            # 4.5 Intercept MODULE/CURRICULUM queries - Fetch from Pinecone
+            # 4.5 Intercept MODULE/CURRICULUM queries — fetch from Pinecone
             if re.search(r"\b(module|modules|curriculum|syllabus|topics|lessons|content|subjects|topics covered)\b", q_lower) or re.search(r"(ඉගෙනුම්|විෂයන්|පරිසර)", q_lower):
-                
-                # Detect which course the user is asking about
                 is_sinhala = bool(re.search(r"[ක-ෆ]", payload.question))
-                
-                # Map course names to query strings
-                courses_to_check = [
-                    ("AI for All", ["ai for all", "certificate ai for all", "e-certificate ai"]),
-                    ("Web Design WordPress", ["web design", "wordpress", "web design wordpress"]),
-                    ("Arduino Robotics", ["arduino", "robotics", "future robotics"]),
-                    ("Web Development", ["web development", "national certificate", "nvq", "web dev"]),
-                    ("AI Content Creation", ["content creation", "ai content", "e-certificate ai content"]),
-                ]
-                
-                course_found = None
-                for course_name, keywords in courses_to_check:
-                    if any(keyword in q_lower for keyword in keywords):
-                        course_found = course_name
-                        break
-                
+                course_found = match_specific_course_name(q_lower)
+
                 if course_found:
-                    # Try to fetch modules from Pinecone first
                     modules_from_db = await get_course_modules_from_pinecone(course_found)
-                    
                     if modules_from_db:
-                        # Use Pinecone data
-                        prompt = f"""The user asked: "{payload.question}"
-
-Course Name: {course_found}
-
-Module Information from Database:
-{modules_from_db}
-
-INSTRUCTIONS:
-1. Extract and list all modules, topics, lessons, and curriculum details clearly
-2. Format each module with: Module Number/Name, Duration, Topics Covered, Learning Outcomes
-3. Respond in the SAME LANGUAGE as the user's question
-4. If the user asked in Sinhala, respond completely in Sinhala
-5. Be comprehensive - include all modules and details found"""
+                        prompt = (
+                            f'The user asked: "{payload.question}"\n\n'
+                            f"Course Name: {course_found}\n\n"
+                            f"Module Information from Database:\n{modules_from_db}\n\n"
+                            "INSTRUCTIONS:\n"
+                            "1. Extract and list all modules, topics, lessons, and curriculum details clearly.\n"
+                            "2. Format each module with: Module Number/Name, Duration, Topics Covered, Learning Outcomes.\n"
+                            "3. Respond in the SAME LANGUAGE as the user's question.\n"
+                            "4. Be comprehensive — include all modules and details found."
+                        )
                         async for chunk in llm.astream(prompt):
                             yield f"data: {json.dumps({'token': chunk.content})}\n\n"
-                        yield "data: [DONE]\n\n"
-                        return
                     else:
-                        # Pinecone failed/empty - use generic response
                         if is_sinhala:
-                            msg = f"""දෙවැනි පසුබිමින් ඇති තොරතුරු අනුව, {course_found} පාඨමාලාවේ සවිස්තරාත්මක ඉගෙනුම් සිටුවමක් ගිණුම් බිම වලින් දැනට ලබා ගත නොහැක. 
-                            
-කරුණාකර එහි වෙබ්‍ය පිටුවට https://lms.lilit.lk/all-courses ඉවත් කර ඕනෑම ඉගෙනුම් විස්තරයන් සෙවීමට ගිය කරුණාකර:"""
+                            msg = f"සමාවන්න, {course_found} පාඨමාලාවේ ඉගෙනුම් තොරතුරු දැනට ලබා ගත නොහැක. https://lms.lilit.lk/all-courses වෙත ගොස් බලන්න."
                         else:
-                            msg = f"""The detailed module curriculum for the {course_found} course is not currently available in our knowledge base.
-
-Please visit: https://lms.lilit.lk/all-courses
-
-We are continuously updating our course modules. For the most current curriculum and module details, please check the official LILIT LMS website or contact us at:
-- Hotline: +94 70 438 8464
-- Help Line: +94 71 661 6699
-- Email: info@lilit.lk"""
-                        
+                            msg = f"The module curriculum for {course_found} is not currently in our knowledge base. Please visit: https://lms.lilit.lk/all-courses"
                         yield f"data: {json.dumps({'token': msg})}\n\n"
-                        yield "data: [DONE]\n\n"
-                        return
                 else:
-                    # Generic module query without specific course
-                    if is_sinhala:
-                        msg = "කරුණාකර ඔබ කිසින් ඉගෙනුම්වලින් විස්තරයන් ඇසුවිය යුතුය. උදා: 'AI for All ඉගෙනුම් කරුණු?' හෝ 'WordPress පාඨමාලාවේ විෂයන්?'"
-                    else:
-                        msg = "Please specify which course you want to know about. For example: 'What are the modules for AI for All?' or 'Show me the curriculum for WordPress course?'"
-                    
+                    msg = (
+                        "කරුණාකර ඔබට දැන ගැනීමට අවශ්‍ය පාඨමාලාව සඳහන් කරන්න. උදා: 'AI for All ඉගෙනුම් කරුණු?'" if is_sinhala
+                        else "Please specify which course you want to know about. Example: 'What are the modules for AI for All?'"
+                    )
                     yield f"data: {json.dumps({'token': msg})}\n\n"
-                    yield "data: [DONE]\n\n"
-                    return
+                yield "data: [DONE]\n\n"
+                return
 
             # 5a. Intercept COURSE NAMES ONLY query
             # Triggered when user asks for a list/names of courses WITHOUT asking for details/fees/overview
@@ -929,36 +775,53 @@ We are continuously updating our course modules. For the most current curriculum
             ) or re.search(r"(පාඨමාලා විස්තර|පාඨමාලා ගාස්තු)", q_lower)
 
             if _course_names_pattern and not _course_details_pattern:
-                # Return only course names
-                course_names_text = get_all_course_names_formatted()
+                # 5a. Course names only — fetch from Pinecone
                 is_sinhala = bool(re.search(r"[ක-ෆ]", payload.question))
-                if is_sinhala:
-                    answer = f"LILIT ආයතනයේ ඇති පාඨමාලා:\n\n{course_names_text}\n\nඕනෑම පාඨමාලාවක් ගැන වැඩිදුර විස්තර ලබා ගැනීමට, එහි නම සඳහන් කරන්න."
+                context = await get_courses_context_from_pinecone()
+                if context:
+                    prompt = (
+                        f'The user asked: "{payload.question}"\n\n'
+                        f"Courses context from database:\n{context}\n\n"
+                        "INSTRUCTIONS:\n"
+                        "- List ONLY the course names as a numbered list. Do NOT include fees or details.\n"
+                        "- Respond in the SAME LANGUAGE as the user's question.\n"
+                        "- End with: 'Ask me about any specific course for full details.'"
+                    )
+                    async for chunk in llm.astream(prompt):
+                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
                 else:
-                    answer = f"Here are the courses offered by LILIT:\n\n{course_names_text}\n\nAsk me about any specific course for full details."
-                yield f"data: {json.dumps({'token': answer})}\n\n"
+                    names = "\n".join(f"{i+1}. {n}" for i, (n, _) in enumerate(_COURSE_KEYWORDS))
+                    answer = (f"LILIT ආයතනයේ ඇති පාඨමාලා:\n\n{names}" if is_sinhala
+                              else f"Here are the courses offered by LILIT:\n\n{names}")
+                    yield f"data: {json.dumps({'token': answer})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
 
-            # 5b. Intercept GENERAL Course DETAILS query - Use authoritative hardcoded data
+            # 5b. General course details — fetch from Pinecone
             if _course_details_pattern or re.search(
                 r"\b(courses? details?|all course details?|full course info)\b", q_lower
             ) or re.search(r"(පාඨමාලා විස්තර|පාඨමාලා ගාස්තු)", q_lower):
-                all_courses_text = get_all_courses_formatted()
-                prompt = f"""The user asked: "{payload.question}"
-
-Complete Course Information (ALL 5 courses):
-{all_courses_text}
-
-INSTRUCTIONS:
-- Respond in the SAME LANGUAGE as the user's question. If they asked in Sinhala, respond in Sinhala. If they asked in English, respond in English.
-- List EVERY single course — do not skip any.
-- For EACH course present: Course Name (bold), Duration, Course Fee, and full Overview.
-- Each course must be separated by a blank line.
-- Do NOT summarise or shorten the Overview of any course.
-- Do NOT say 'Not specified' for any field — all fields are provided above."""
-                async for chunk in llm.astream(prompt):
-                    yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                all_courses_text = await get_courses_context_from_pinecone()
+                if all_courses_text:
+                    prompt = (
+                        f'The user asked: "{payload.question}"\n\n'
+                        f"Complete Course Information from database:\n{all_courses_text}\n\n"
+                        "INSTRUCTIONS:\n"
+                        "- Respond in the SAME LANGUAGE as the user's question.\n"
+                        "- List EVERY course found — do not skip any.\n"
+                        "- For EACH course present: Course Name (bold), Duration, Course Fee, and full Overview.\n"
+                        "- Each course must be separated by a blank line.\n"
+                        "- Do NOT summarise or shorten the Overview of any course."
+                    )
+                    async for chunk in llm.astream(prompt):
+                        yield f"data: {json.dumps({'token': chunk.content})}\n\n"
+                else:
+                    # Pinecone unavailable — let the standard qa_chain handle it
+                    if qa_chain:
+                        async for chunk in qa_chain.astream(payload.question):
+                            yield f"data: {json.dumps({'token': chunk})}\n\n"
+                    else:
+                        yield f"data: {json.dumps({'token': 'Course information is not available at the moment. Please visit https://lms.lilit.lk/all-courses'})}\n\n"
                 yield "data: [DONE]\n\n"
                 return
 
