@@ -1,11 +1,36 @@
 
-# venv\Scripts\deactivate  
-# python -m venv venv        
-# venv\Scripts\activate  
+# ============================================================
+# SETUP COMMANDS  (run in order the first time)
+# ============================================================
+# venv\Scripts\deactivate
+# python -m venv venv
+# venv\Scripts\activate
 # pip install -r requirements.txt
-# uvicorn server:app --reload 
 
-most important to run the indexer.py to save data to vector database, 
-then run server.py to start the chatbot server.
+# ============================================================
+# RUNNING THE SERVER  (daily use)
+# ============================================================
+# 1. Index data into Pinecone first:
+#    python indexer.py
+#
+# 2. Start the chatbot server:
+#    uvicorn server:app --reload
 
+# ============================================================
+# TEST WEBHOOK  — PowerShell (works on Windows)
+# ============================================================
+# LOCAL TEST (while server is running on localhost):
 
+$body = '{"course_id":"TEST-101","title":"Test Auto-Sync Course","description":"Checking if the webhook successfully connects to Pinecone.","duration":"1 Week","fee":"Free","url":"https://lms.lilit.lk/course-details/101"}'
+Invoke-WebRequest -Uri "http://localhost:8000/api/sync-course" -Method POST -Headers @{"Content-Type"="application/json"; "X-Sync-Token"="LILIT_LMS_Sync_8f92a4b6c3d1e7"} -Body $body
+
+# PRODUCTION TEST (replace YOUR-RENDER-URL with your real Render subdomain):
+
+$body = '{"course_id":"TEST-101","title":"Test Auto-Sync Course","description":"Checking if the webhook successfully connects to Pinecone.","duration":"1 Week","fee":"Free","url":"https://lms.lilit.lk/course-details/101"}'
+Invoke-WebRequest -Uri "https://YOUR-RENDER-URL.onrender.com/api/sync-course" -Method POST -Headers @{"Content-Type"="application/json"; "X-Sync-Token"="LILIT_LMS_Sync_8f92a4b6c3d1e7"} -Body $body
+
+# ============================================================
+# TEST WRONG TOKEN  — should return HTTP 403
+# ============================================================
+
+Invoke-WebRequest -Uri "http://localhost:8000/api/sync-course" -Method POST -Headers @{"Content-Type"="application/json"; "X-Sync-Token"="wrong-token"} -Body $body -ErrorAction Continue
