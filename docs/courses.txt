@@ -1,0 +1,213 @@
+LILIT LMS - OFFICIAL COURSE CATALOG
+====================================
+Lanka Institute of Language and Information Technology
+Website: https://lms.lilit.lk
+Contact: info@lilit.lk | Hotline: +94 70 438 8464 | Help Line: +94 71 661 6699
+
+==========================================================================
+COURSE 1: AI for All
+Course URL: https://lms.lilit.lk/course-details/2
+Duration: Self-paced / Online
+Course Fee: LKR 3,000.00
+Category: Technology / Artificial Intelligence
+==========================================================================
+
+OVERVIEW:
+AI for All is an introductory course designed for everyone — students, teachers, parents, and professionals — who wants to understand and use Artificial Intelligence in their daily lives. No prior technical knowledge is required.
+
+WHAT YOU WILL LEARN:
+- Prompt Engineering: How to effectively craft prompts to get maximum results from AI tools.
+- AI Ethics: Using AI responsibly and understanding data privacy.
+- For Students: Easily complete homework, summarize content, and conduct academic research.
+- For Teachers: Instantly prepare lesson plans, question papers, and assessments.
+- For Parents: Support children's education and home activities with AI.
+- Productivity: Quickly draft emails, reports, and meeting notes.
+- Business Promotion: Use AI for marketing ideas, web copy, and customer service.
+- Data Analysis: Understand large datasets and make better decisions.
+- Content Creation: Generate blog posts, social media content, and scripts quickly.
+- Image and Video Content Creation.
+- Home & Garden decoration using AI.
+- Budget management with AI.
+- Makeup/Hair Virtual Try-Ons.
+- Food recipe generation and daily home tasks using AI tools.
+
+BATCHES AVAILABLE:
+- AI for All BATCH 11
+- AI for All BATCH 12
+- AI for All BATCH 13
+- AI for All BATCH 16 - Live Recording
+- AI for All BATCH 22 - Live Recording
+
+All batches are under the same AI for All course. The course fee is LKR 3,000.00 for any batch.
+Enroll at: https://lms.lilit.lk/register
+
+==========================================================================
+COURSE 2: Arduino With Future Robotics
+Course URL: https://lms.lilit.lk/course-details/3
+Duration: Self-paced / Online
+Course Fee: LKR 5,000.00
+Category: Technology / Robotics / Engineering
+==========================================================================
+
+OVERVIEW:
+Arduino With Future Robotics is a hands-on course that teaches students how to build and program robots using Arduino. Ideal for beginners who want to enter the world of electronics and programming.
+
+COURSE OVERVIEW / SUBJECTS COVERED:
+- Basic Electronics: Understanding electronic components and how they work in a simple way.
+- Mechanical Technology: Learning the principles and tools needed to build physical creations.
+- Computer Programming: Mastering the basics of coding to bring robots to life.
+
+MODULES:
+1. Introduction to Arduino and Robotics.
+2. Installing Arduino IDE, Drivers and Libraries.
+3. Basics of Electronics for Beginners.
+4. Robotic Components and Hardware.
+5. Robotic Sensors and Applications.
+6. Fundamentals of Arduino Programming.
+7. Hands-on Projects with Arduino.
+
+Enroll at: https://lms.lilit.lk/register
+
+==========================================================================
+COURSE 3: National Certificate in Web Development
+Course URL: https://lms.lilit.lk/course-details/4
+Duration: NVQ Level - Full Certificate Program
+Course Fee: LKR 30,000.00
+Category: Technology / Web Development / NVQ
+==========================================================================
+
+OVERVIEW:
+The National Certificate in Web Development is a comprehensive, government-recognized (NVQ) professional certification program. It trains students from the fundamentals of web development to building full-stack dynamic web applications.
+
+MODULES / SUBJECTS COVERED:
+- English For Web Developer.
+- Computer Awareness.
+- Identify Client's Requirements.
+- Identify Web Development Tools.
+- Prepare Project Proposal.
+- Develop a Static Web Application.
+- Develop a Dynamic Web Application.
+- Develop a Website Based on CMS.
+- Hosting a Website.
+
+Enroll at: https://lms.lilit.lk/register
+
+==========================================================================
+COURSE 4: Web Design WordPress with AI
+Course URL: https://lms.lilit.lk/course-details/5
+Duration: Self-paced / Online
+Course Fee: LKR 4,500.00
+Category: Technology / Web Design / WordPress
+==========================================================================
+
+OVERVIEW:
+Web Design WordPress with AI teaches you to build professional websites using WordPress, enhanced with AI tools for content generation. Perfect for beginners and small business owners who want to establish an online presence.
+
+MODULES / SUBJECTS COVERED:
+- Introduction to Web Development and WordPress.
+- Setting Up the Web Development Environment.
+- Understanding and Customizing the WordPress Working Environment.
+- Create Menu Structure, Header, and Footer.
+- Page Setup and Working with Page Builders.
+- Using AI Tools for Content Generation.
+- Working with eCommerce.
+- Learning How to Perform Backup and Restore.
+- Website Security Tools.
+- Performance and Optimization.
+- Search Engine Optimization (SEO).
+- Setting Up Proper Email Sending for Your Website (SMTP).
+- Final Project.
+
+Enroll at: https://lms.lilit.lk/register
+
+==========================================================================
+COURSE 5: AI Content Creation
+Course URL: https://lms.lilit.lk/course-details/7
+Duration: Self-paced / Online
+Course Fee: LKR 12,000.00
+Category: Technology / AI / Content Creation / Digital Media
+==========================================================================
+
+OVERVIEW:
+AI Content Creation is an advanced, comprehensive course covering AI-based content production — from images, videos, music, and graphics to social media monetization. Taught by LILIT tutors, this course takes you from zero to professional level in AI content creation.
+
+WHAT YOU WILL LEARN:
+- Prompt Engineering: From zero level to 'Prompt Master' (Techniques and JSON Prompts).
+- AI Image & Video Generation: Turn your ideas into images and create Viral and Cinematic videos.
+- AI Music Generation: Create music without copyright issues.
+- Video Editing: Professional video editing from scratch using CapCut.
+- Social Media Mastery: Build an audience on YouTube and Facebook and earn income.
+
+MODULES:
+1. Introduction to AI (AI - Artificial Intelligence Introduction)
+2. Introduction to AI Tools (Chat GPT, account creations)
+3. What is a Prompt – Prompt Engineering (Zero to Prompt Master with JSON Prompts)
+4. Image Generation – AI Image Creation Art
+5. Video Generation – High-quality AI Video Production
+6. Music Generation – AI Music Creation
+7. Social Media & Monetization (YouTube, Facebook, Fiverr)
+8. Graphic Design with AI (Thumbnails, Business Cards, Logos, Flyers, Brochures, Posters)
+9. Video Editing with CapCut (EP 01-04)
+10. AI Text & Scripting – Writing letters, scripts with AI
+11. Final Quiz
+
+Online payment link: https://lms.lilit.lk/register?d=eyJtIjoib25saW5lIiwiYyI6ODAsInAiOiJvayJ9
+Enroll at: https://lms.lilit.lk/register
+
+==========================================================================
+COURSE 6: AI for School Students – Age 9-13
+Course URL: https://lms.lilit.lk/all-courses
+Duration: Self-paced / Online (Multiple Batches Available)
+Course Fee: Please contact LILIT for current batch fees.
+Category: Technology / AI / School Students / Kids
+==========================================================================
+
+OVERVIEW:
+AI for School Students (Age 9-13) is a specially designed course for young learners aged 9 to 13 years. It introduces children to artificial intelligence concepts in a fun, age-appropriate, and interactive way.
+
+BATCHES AVAILABLE:
+- AI for School Students Age 9-13 Batch 2
+- AI for School Students Age 9-13 Batch 3
+- AI for School Students Age 9-13 Batch 4
+- AI for School Students Age 9-13 Batch 6
+- AI for School Students Age 9-13 Batch 7
+- AI for School Students Age 9-13 Batch 8
+
+For fee details and batch schedules, contact LILIT:
+Hotline: +94 70 438 8464 | Help Line: +94 71 661 6699 | Email: info@lilit.lk
+
+==========================================================================
+COURSE 7: AI for School Students – Age 6-8
+Course URL: https://lms.lilit.lk/all-courses
+Duration: Self-paced / Online (Multiple Batches Available)
+Course Fee: Please contact LILIT for current batch fees.
+Category: Technology / AI / School Students / Kids
+==========================================================================
+
+OVERVIEW:
+AI for School Students (Age 6-8) is designed for very young learners aged 6 to 8 years. It introduces foundational digital literacy and simple AI concepts in a playful, age-appropriate format.
+
+BATCHES AVAILABLE:
+- AI for School Students Age 6-8 Batch 2
+- AI for School Students Age 6-8 Batch 3
+- AI for School Students Age 6-8 Batch 4
+- AI for School Students Age 6-8 Batch 6
+- AI for School Students Age 6-8 Batch 7
+- AI for School Students Age 6-8 Batch 8
+
+For fee details and batch schedules, contact LILIT:
+Hotline: +94 70 438 8464 | Help Line: +94 71 661 6699 | Email: info@lilit.lk
+
+==========================================================================
+COURSE FEE SUMMARY
+==========================================================================
+1. AI for All                                 - LKR 3,000.00
+2. Arduino With Future Robotics               - LKR 5,000.00
+3. National Certificate in Web Development   - LKR 30,000.00
+4. Web Design WordPress with AI              - LKR 4,500.00
+5. AI Content Creation                        - LKR 12,000.00
+6. AI for School Students (Age 9-13)          - Contact LILIT for fee
+7. AI for School Students (Age 6-8)           - Contact LILIT for fee
+
+Flexible payment plans may be available for all courses.
+To enroll or get more information, visit: https://lms.lilit.lk

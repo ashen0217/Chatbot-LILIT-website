@@ -95,7 +95,7 @@ INSTRUCTIONS:
    - Address: D/263/2, Magammana, Dehiowita.
    (List ALL of these if the user asks for general contact info). 
 
-4. **COURSE DETAILS (CRITICAL FORMATTING):** If asked about courses, list EACH course in a separate paragraph. Do NOT combine them into one block of text. For each course, clearly list its Name, Duration, Course Fee, and a brief Explanation/Overview on separate lines using bullet points. Ensure there is a blank line between different courses. IMPORTANT: Always search the context carefully for course fee information - NEVER say "Not specified" if a fee amount is mentioned anywhere in the context. If a fee is truly not mentioned, you may say it then.
+4. **COURSE DETAILS (CRITICAL FORMATTING):** If asked about courses, list EACH course in a separate paragraph. Do NOT combine them into one block of text. For each course, clearly list its Name, Duration, Course Fee, and a brief Explanation/Overview on separate lines using bullet points. Ensure there is a blank line between different courses. CRITICAL: Scan EVERY line of the context for duration, fee, and overview values. NEVER write "Not specified" or "Not available" if the information exists anywhere in the context text. Only say a field is unavailable if it is genuinely absent from the context.
 
 5. **Completeness:** Do not give short answers. If you find the info, give the full details found in the text files.
 
@@ -120,8 +120,8 @@ QA_CHAIN_PROMPT = PromptTemplate(
 # 2. SETUP CHAIN - Only if vectorstore is available
 if vectorstore:
     retriever = vectorstore.as_retriever(
-        search_kwargs={"k": 5}
-    )  # Reduced from 10 to 5 for faster retrieval
+        search_kwargs={"k": 12}
+    )  # Increased to 12 for better course coverage
 
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
@@ -354,7 +354,77 @@ COURSE FEE: {fee}
 
 
 # ---------------------------------------------------------------------------
-# Pinecone-backed helpers — all data sourced from Pinecone, cached 60 min
+# AUTHORITATIVE COURSE DATA — sourced directly from lms.lilit.lk
+# Always prepended to Pinecone results to ensure fee/duration accuracy.
+# ---------------------------------------------------------------------------
+
+AUTHORITATIVE_COURSE_DATA = """
+=== LILIT OFFICIAL COURSE CATALOG ===
+
+--- COURSE: AI for All ---
+URL: https://lms.lilit.lk/course-details/2
+Course Fee: LKR 3,000.00
+Duration: Self-paced / Online
+Batches: BATCH 11, BATCH 12, BATCH 13, BATCH 16 (Live Recording), BATCH 22 (Live Recording)
+Overview: AI for All is an introductory course for everyone — students, teachers, parents, and professionals. No prior technical knowledge needed.
+Topics: Prompt Engineering, AI Ethics, homework help, lesson planning, productivity (emails/reports), business promotion, data analysis, content creation (blogs/social media), AI image & video creation, home uses of AI.
+
+--- COURSE: Arduino With Future Robotics ---
+URL: https://lms.lilit.lk/course-details/3
+Course Fee: LKR 5,000.00
+Duration: Self-paced / Online
+Overview: Hands-on course teaching students to build and program robots using Arduino. Ideal for beginners in electronics and programming.
+Modules: Introduction to Arduino & Robotics, Installing Arduino IDE, Basic Electronics, Robotic Components & Hardware, Robotic Sensors & Applications, Arduino Programming, Hands-on Projects.
+
+--- COURSE: National Certificate in Web Development ---
+URL: https://lms.lilit.lk/course-details/4
+Course Fee: LKR 30,000.00
+Duration: NVQ Level Full Certificate Program
+Overview: Government-recognized (NVQ) professional certification. Trains students from fundamentals of web development to full-stack dynamic applications.
+Modules: English for Web Developer, Computer Awareness, Client Requirements, Web Development Tools, Project Proposal, Static Web App, Dynamic Web App, CMS-based Website, Website Hosting.
+
+--- COURSE: Web Design WordPress with AI ---
+URL: https://lms.lilit.lk/course-details/5
+Course Fee: LKR 4,500.00
+Duration: Self-paced / Online
+Overview: Build professional websites using WordPress enhanced with AI content generation tools. Perfect for beginners and small business owners.
+Modules: WordPress Introduction, Web Dev Environment Setup, WordPress Customization, Menu/Header/Footer, Page Builders, AI Content Generation, eCommerce, Backup & Restore, Security, SEO, SMTP Email, Final Project.
+
+--- COURSE: AI Content Creation ---
+URL: https://lms.lilit.lk/course-details/7
+Course Fee: LKR 12,000.00
+Duration: Self-paced / Online
+Overview: Advanced AI-based content production covering images, videos, music, graphics, and social media monetization. From zero to professional level.
+Modules: AI Introduction, AI Tools (ChatGPT), Prompt Engineering (JSON Prompts), AI Image Generation, AI Video Generation, AI Music Generation, Social Media & Monetization (YouTube/Facebook/Fiverr), Graphic Design with AI, Video Editing with CapCut, AI Text & Scripting, Final Quiz.
+
+--- COURSE: AI for School Students Age 9-13 ---
+URL: https://lms.lilit.lk/all-courses
+Course Fee: Please contact LILIT for fee details.
+Duration: Self-paced / Online (Multiple Batches)
+Batches: Batch 2, Batch 3, Batch 4, Batch 6, Batch 7, Batch 8
+Overview: Specially designed for young learners aged 9 to 13 years, introducing AI concepts in a fun, interactive, age-appropriate way.
+Contact: +94 70 438 8464 | info@lilit.lk
+
+--- COURSE: AI for School Students Age 6-8 ---
+URL: https://lms.lilit.lk/all-courses
+Course Fee: Please contact LILIT for fee details.
+Duration: Self-paced / Online (Multiple Batches)
+Batches: Batch 2, Batch 3, Batch 4, Batch 6, Batch 7, Batch 8
+Overview: Designed for very young learners aged 6 to 8 years, introducing foundational digital literacy and simple AI concepts in a playful format.
+Contact: +94 70 438 8464 | info@lilit.lk
+
+=== COURSE FEE QUICK REFERENCE ===
+- AI for All: LKR 3,000.00
+- Arduino With Future Robotics: LKR 5,000.00
+- National Certificate in Web Development: LKR 30,000.00
+- Web Design WordPress with AI: LKR 4,500.00
+- AI Content Creation: LKR 12,000.00
+- AI for School Students (Age 9-13): Contact LILIT
+- AI for School Students (Age 6-8): Contact LILIT
+"""
+
+# ---------------------------------------------------------------------------
+# Pinecone-backed helpers — data sourced from Pinecone + authoritative fallback
 # ---------------------------------------------------------------------------
 
 async def _pinecone_search(query: str, k: int = 6) -> str:
@@ -370,30 +440,47 @@ async def _pinecone_search(query: str, k: int = 6) -> str:
 
 
 async def get_courses_context_from_pinecone() -> str:
-    """Fetch all course details (name, duration, fee, overview) from Pinecone."""
+    """Fetch all course details (name, duration, fee, overview) from Pinecone.
+    Always prepends AUTHORITATIVE_COURSE_DATA so fees are never missing.
+    """
     cache_key = "pinecone_all_courses"
     cached = cache.get(cache_key)
     if cached:
         return cached
-    result = await _pinecone_search(
-        "LILIT courses list name duration fee overview description", k=8
-    )
-    if result:
-        cache.set(cache_key, result)
+    # Use multiple targeted queries and merge results for completeness
+    queries = [
+        "LILIT courses list name duration fee overview description",
+        "AI for All course duration fee batch",
+        "AI for School Students course duration fee age",
+        "Arduino robotics web development WordPress AI content creation course fee duration",
+    ]
+    results = []
+    for q in queries:
+        r = await _pinecone_search(q, k=12)
+        if r:
+            results.append(r)
+    pinecone_context = "\n\n".join(results) if results else ""
+    # Always prepend authoritative data to ensure fees are accurate
+    result = AUTHORITATIVE_COURSE_DATA + "\n\n" + pinecone_context
+    cache.set(cache_key, result)
     return result
 
 
 async def get_specific_course_from_pinecone(course_name: str) -> str:
-    """Fetch details for a single named course from Pinecone."""
+    """Fetch details for a single named course from Pinecone.
+    Always prepends AUTHORITATIVE_COURSE_DATA so fees are never missing.
+    """
     cache_key = f"pinecone_course_{course_name.lower().replace(' ', '_')}"
     cached = cache.get(cache_key)
     if cached:
         return cached
-    result = await _pinecone_search(
-        f"{course_name} course duration fee overview description", k=6
-    )
-    if result:
-        cache.set(cache_key, result)
+    # Run two targeted queries to maximise detail coverage
+    r1 = await _pinecone_search(f"{course_name} course duration fee overview description", k=10)
+    r2 = await _pinecone_search(f"{course_name} batch price cost weeks months", k=8)
+    pinecone_context = "\n\n".join(filter(None, [r1, r2]))
+    # Always prepend authoritative data so LLM has the real fee/duration
+    result = AUTHORITATIVE_COURSE_DATA + "\n\n" + pinecone_context
+    cache.set(cache_key, result)
     return result
 
 
@@ -441,7 +528,8 @@ async def get_about_from_pinecone() -> str:
 
 # Keyword map for matching a specific course mentioned in a question
 _COURSE_KEYWORDS = [
-    ("AI for All", ["ai for all", "certificate ai for all", "e-certificate ai", "ai for school", "ai for student"]),
+    ("AI for All", ["ai for all", "certificate ai for all", "e-certificate ai for all"]),
+    ("AI for School Students", ["ai for school", "school students", "ai for school students", "age 9", "age 6", "age 13", "age 8"]),
     ("Arduino With Future Robotics", ["arduino", "robotics", "future robotics"]),
     ("National Certificate in Web Development", ["web development", "national certificate", "nvq", "web dev"]),
     ("Web Design WordPress with AI", ["web design", "wordpress", "web design wordpress"]),
@@ -496,7 +584,12 @@ def is_lilit_related_query(question: str) -> bool:
     """
     q_lower = question.lower()
 
-    # LILIT-related keywords
+    # If the question contains any Sinhala Unicode characters, treat it as
+    # potentially LILIT-related (Sinhala users are almost always asking about LILIT)
+    if re.search(r"[\u0D80-\u0DFF]", question):
+        return True
+
+    # LILIT-related keywords (English)
     lilit_keywords = [
         "lilit",
         "lms",
@@ -537,16 +630,24 @@ def is_lilit_related_query(question: str) -> bool:
         "event",
         "admission",
         "apply",
-        "දැක්ම",
-        "මෙහෙවර",
-        "අරමුණු",
-        "පාඨමාලා",
-        "ලිලිට්",
-        "ඉගෙනීම",
-        "අධ්‍යාපනය",
-        "ගිණුම",
-        "ලියාපදිංචි",
-        "ගිණුම්",
+        "batch",
+        "school",
+        "sinhala",
+        "language",
+        "help",
+        "talk",
+        "speak",
+        "chat",
+        "price",
+        "cost",
+        "register",
+        "enroll",
+        "join",
+        "duration",
+        "overview",
+        "details",
+        "information",
+        "info",
     ]
 
     # Check if any LILIT keyword exists in the question
